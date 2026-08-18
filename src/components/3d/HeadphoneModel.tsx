@@ -101,30 +101,59 @@ export default function HeadphoneModel({ activeVariant, ...props }: HeadphoneMod
     if (group.current && innerGroup.current) {
       const p = getScrollProgress();
       
-      let targetRotationY = 0;
+      let baseRotY = 0;
       let targetRotationX = 0;
-      if (p > 0.2 && p <= 0.6) {
-        targetRotationY = Math.PI * ((p - 0.2) / 0.4);
-      } else if (p > 0.6 && p <= 1.0) {
-        targetRotationY = Math.PI;
-      } else if (p > 1.0 && p <= 2.0) {
-        targetRotationY = Math.PI + (Math.PI / 3) * (Math.min(p - 1.0, 0.5) / 0.5);
-      } else if (p > 2.0 && p <= 3.0) {
-        targetRotationY = Math.PI + (Math.PI / 3);
-        targetRotationX = 0; 
-      } else if (p > 3.0 && p <= 4.0) {
-        targetRotationY = (Math.PI + Math.PI / 3) + (Math.PI / 1.5) * (Math.min(p - 3.0, 0.8) / 0.8);
-        targetRotationX = 0;
-      } else if (p > 4.0) {
-        targetRotationY = Math.PI * 2 + (Math.PI / 6);
-        targetRotationX = 0;
+
+      const getMoveP = (localP: number) => Math.min(localP / 0.75, 1.0);
+      const getSpinP = (localP: number) => Math.min(Math.max(localP - 0.75, 0) / 0.15, 1.0);
+
+      // Section 1 (0 to 1.0)
+      let p1 = Math.min(Math.max(p, 0), 1.0);
+      let m1 = getMoveP(p1);
+      let s1 = getSpinP(p1);
+      baseRotY += (Math.PI) * m1;
+      baseRotY += (Math.PI * 2) * s1;
+
+      // Section 2 (1.0 to 2.0)
+      if (p > 1.0) {
+        let p2 = Math.min(Math.max(p - 1.0, 0), 1.0);
+        let m2 = getMoveP(p2);
+        let s2 = getSpinP(p2);
+        baseRotY += (Math.PI / 3) * m2;
+        baseRotY += (Math.PI * 2) * s2;
+      }
+      
+      // Section 3 (2.0 to 3.0)
+      if (p > 2.0) {
+        let p3 = Math.min(Math.max(p - 2.0, 0), 1.0);
+        // Section 3 has no base rotation change
+        let s3 = getSpinP(p3);
+        baseRotY += (Math.PI * 2) * s3;
+      }
+
+      // Section 4 (3.0 to 4.0)
+      if (p > 3.0) {
+        let p4 = Math.min(Math.max(p - 3.0, 0), 1.0);
+        let m4 = getMoveP(p4);
+        let s4 = getSpinP(p4);
+        baseRotY += (Math.PI / 1.5) * m4;
+        baseRotY += (Math.PI * 2) * s4;
+      }
+
+      // Section 5 (4.0 to 5.0)
+      if (p > 4.0) {
+        let p5 = Math.min(Math.max(p - 4.0, 0), 1.0);
+        let m5 = getMoveP(p5);
+        let s5 = getSpinP(p5);
+        baseRotY += (Math.PI / 6) * m5;
+        baseRotY += (Math.PI * 2) * s5;
       }
       
       const idleRot = state.clock.elapsedTime * 0.05;
       
       group.current.rotation.y = THREE.MathUtils.lerp(
         group.current.rotation.y, 
-        targetRotationY + idleRot, 
+        baseRotY + idleRot, 
         0.05
       );
       group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, targetRotationX, 0.05);

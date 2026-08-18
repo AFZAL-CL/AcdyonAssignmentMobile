@@ -23,50 +23,84 @@ function CameraController() {
     const p = getScrollProgress();
     if (!cameraRef.current) return;
 
+    const isMobile = window.innerWidth < 768;
+
     let targetX = 0;
     let targetY = 0;
-    let targetZ = 8.5; // Default Z
+    let targetZ = 8.5;
     let targetLookX = 0;
     let targetLookY = 0;
 
-    // Determine camera targets based on scroll phase
-    if (p <= 1.0) {
-      // Phase 1 to 4: Hero Idle (Slight zoom and pan)
-      targetZ = 8.5 - 1.5 * p; // Zooms in from 8.5 to 7.0
-      targetY = -2.1 * p; // Pans camera DOWN, smoothly pushing headphone UP to perfectly clear bottom text
-      targetLookY = -2.1 * p;
-    } else if (p > 1.0 && p <= 2.0) {
-      // Phase 5: Transition to Section 2 (Product Design Reveal)
-      let localP = Math.min(p - 1.0, 0.5) / 0.5;
-      targetX = -2.2 * localP; // Pans camera LEFT, pushing headphone RIGHT
-      targetLookX = -2.2 * localP;
-      targetY = -2.1 + 1.6 * localP; // Smoothly transitions from -2.1 to -0.5 for callout alignment
-      targetLookY = -2.1 + 1.6 * localP;
-      targetZ = 7.0;
-    } else if (p > 2.0 && p <= 3.0) {
-      // Phase 6: Transition to Section 3 (Engineered for Sound)
-      let localP = Math.min(p - 2.0, 0.5) / 0.5;
-      targetX = -3.0 + 4.2 * localP;
-      targetLookX = -2.2 + 3.9 * localP;
-      targetY = -0.5; // Stays perfectly centered for bullseye
+    const getMoveP = (localP: number) => Math.min(localP / 0.75, 1.0);
+
+    // Phase 1 (0 to 1.0)
+    let p1 = Math.min(Math.max(p, 0), 1.0);
+    let m1 = getMoveP(p1);
+    targetZ = 8.5 - 1.5 * m1;
+    targetY = -2.1 * m1;
+    targetLookY = -2.1 * m1;
+
+    // Phase 2 (1.0 to 2.0)
+    if (p > 1.0) {
+      let p2 = Math.min(Math.max(p - 1.0, 0), 1.0);
+      let m2 = getMoveP(p2);
+      targetX = isMobile ? 0 : -2.2 * m2;
+      targetLookX = isMobile ? 0 : -2.2 * m2;
+      targetY = -2.1 + 1.6 * m2;
+      targetLookY = -2.1 + 1.6 * m2;
+    }
+
+    // Phase 3 (2.0 to 3.0)
+    if (p > 2.0) {
+      let p3 = Math.min(Math.max(p - 2.0, 0), 1.0);
+      let m3 = getMoveP(p3);
+      targetX = isMobile ? 0 : -2.2 + 3.4 * m3;
+      targetLookX = isMobile ? 0 : -2.2 + 3.4 * m3;
+      targetY = -0.5;
       targetLookY = -0.5;
-      targetZ = 7.0 + 1.0 * localP;
-    } else if (p > 3.0 && p <= 4.0) {
-      // Phase 7: Transition to Section 4 (Product Features Showcase)
-      let localP = Math.min(p - 3.0, 0.5) / 0.5;
-      targetX = 1.2 - 1.2 * localP;
-      targetLookX = 1.2 - 1.2 * localP;
-      targetY = -0.5 - 2.5 * localP; // Pushes high up to -3.0 for final section
-      targetLookY = -0.5 - 2.5 * localP;
-      targetZ = 8.0 + 0.5 * localP;
-    } else if (p > 4.0) {
-      // Phase 8: Transition to Section 5 (Product Configurator)
-      let localP = Math.min(p - 4.0, 0.5) / 0.5;
-      targetX = -2.0 * localP; // Pans left to push headphone to the right
-      targetLookX = -2.0 * localP;
-      targetY = -3.0 + 2.5 * localP; // Brings headphone back down to perfectly center it
-      targetLookY = -3.0 + 2.5 * localP;
-      targetZ = 8.5 - 1.5 * localP; // Zooms in for a prominent product shot
+      targetZ = 7.0 + 1.0 * m3;
+    }
+
+    // Phase 4 (3.0 to 4.0)
+    if (p > 3.0) {
+      let p4 = Math.min(Math.max(p - 3.0, 0), 1.0);
+      let m4 = getMoveP(p4);
+      targetX = isMobile ? 0 : 1.2 - 1.2 * m4;
+      targetLookX = isMobile ? 0 : 1.2 - 1.2 * m4;
+      targetY = -0.5 - 2.5 * m4;
+      targetLookY = -0.5 - 2.5 * m4;
+      targetZ = 8.0 + 0.5 * m4;
+    }
+
+    // Phase 5 (4.0 to 5.0)
+    if (p > 4.0) {
+      let p5 = Math.min(Math.max(p - 4.0, 0), 1.0);
+      let m5 = getMoveP(p5);
+      targetX = isMobile ? 0 : -2.0 * m5;
+      targetLookX = isMobile ? 0 : -2.0 * m5;
+      targetY = -3.0 + 2.5 * m5;
+      targetLookY = -3.0 + 2.5 * m5;
+      targetZ = 8.5 - 1.5 * m5;
+    }
+
+    if (isMobile) {
+      targetX = 0;
+      targetLookX = 0;
+      targetZ += 3.5; // Pull camera back significantly on mobile to prevent clipping
+      
+      // Specifically adjust vertical positioning for mobile where layouts stack
+      if (p > 3.0 && p <= 4.0) {
+         let p4 = Math.min(Math.max(p - 3.0, 0), 1.0);
+         let m4 = getMoveP(p4);
+         targetY += 1.0 * m4; 
+         targetLookY += 1.0 * m4;
+      }
+      if (p > 4.0) {
+         let p5 = Math.min(Math.max(p - 4.0, 0), 1.0);
+         let m5 = getMoveP(p5);
+         targetY -= 1.0 * m5;
+         targetLookY -= 1.0 * m5;
+      }
     }
 
     cameraRef.current.position.x = THREE.MathUtils.lerp(cameraRef.current.position.x, targetX, 0.05);
