@@ -49,11 +49,11 @@ function CameraController({ actualVisualCenter }: { actualVisualCenter: React.Re
     // Zoom is a scalar where 1.0 represents the baseline reference distance (Z=7.0)
     const SECTION_FRAMING = {
       desktop: [
-        { x: 0.50, y: 0.37, zoom: 0.82 }, // p=0 (Start)
+        { x: 0.50, y: 0.38, zoom: 0.82 }, // p=0 (Start)
         { x: 0.50, y: 0.22, zoom: 1.00 }, // p=1 (Section 1)
         { x: 0.74, y: 0.29, zoom: 1.00 }, // p=2 (Section 2)
-        { x: 0.50, y: 0.44, zoom: 0.65 }, // p=3 (Section 3 - formerly Section 4)
-        { x: 0.75, y: 0.29, zoom: 1.00 }  // p=4 (Section 4 - formerly Section 5)
+        { x: 0.50, y: 0.16, zoom: 0.65 }, // p=3 (Section 3 - formerly Section 4)
+        { x: 0.75, y: 0.29, zoom: 1.00 }  // p=4 (Section 4 - formerly Section 5, moved up)
       ],
       mobile: [
         { x: 0.50, y: 0.37, zoom: 0.58 }, // p=0
@@ -63,11 +63,11 @@ function CameraController({ actualVisualCenter }: { actualVisualCenter: React.Re
         { x: 0.50, y: 0.19, zoom: 0.67 }  // p=4
       ],
       smallMobile: [
-        { x: 0.50, y: 0.37, zoom: 0.54 }, // p=0
-        { x: 0.50, y: 0.24, zoom: 0.62 }, // p=1
-        { x: 0.50, y: 0.20, zoom: 0.45 }, // p=2 (Adjusted down slightly to fit 40MM top spec)
+        { x: 0.50, y: 0.40, zoom: 0.54 }, // p=0
+        { x: 0.50, y: 0.34, zoom: 0.62 }, // p=1
+        { x: 0.50, y: 0.32, zoom: 0.45 }, // p=2 (Adjusted down slightly to fit 40MM top spec)
         { x: 0.50, y: 0.43, zoom: 0.45 }, // p=3 (Moved up slightly for Sound Field)
-        { x: 0.50, y: 0.19, zoom: 0.62 }  // p=4
+        { x: 0.50, y: 0.26, zoom: 0.62 }  // p=4
       ]
     };
 

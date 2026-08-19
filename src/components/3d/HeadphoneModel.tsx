@@ -108,7 +108,8 @@ export default function HeadphoneModel({ activeVariant, onBoundsCalculated, ...p
       box.getSize(size);
       onBoundsCalculated(center, size);
     }
-  }, [scene, onBoundsCalculated]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scene]);
 
   useFrame((state, delta) => {
     if (group.current && innerGroup.current) {

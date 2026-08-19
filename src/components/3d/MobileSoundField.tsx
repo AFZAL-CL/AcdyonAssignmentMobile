@@ -14,8 +14,9 @@ export default function MobileSoundField({ modelCenter }: { modelCenter: React.R
   const text2Ref = useRef<HTMLParagraphElement>(null);
   const text3Ref = useRef<HTMLParagraphElement>(null);
   const text4Ref = useRef<HTMLParagraphElement>(null);
-  const { viewport } = useThree();
-  const isMobile = viewport.width < 768;
+  const { size } = useThree();
+  const isMobile = size.width < 768;
+  const timeRef = useRef(0);
   
   // Create 5 concentric rings representing sound waves
   const ringGeometries = useMemo(() => {
@@ -42,7 +43,7 @@ export default function MobileSoundField({ modelCenter }: { modelCenter: React.R
     return positions;
   }, []);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (!isMobile) return;
     const p = getScrollProgress();
     
@@ -114,8 +115,9 @@ export default function MobileSoundField({ modelCenter }: { modelCenter: React.R
       
       material.opacity = Math.sin(particleP * Math.PI) * 0.6 * fadeOutP;
       
-      particlesRef.current.rotation.y = state.clock.elapsedTime * 0.08;
-      particlesRef.current.rotation.z = state.clock.elapsedTime * 0.04;
+      timeRef.current += delta;
+      particlesRef.current.rotation.y = timeRef.current * 0.08;
+      particlesRef.current.rotation.z = timeRef.current * 0.04;
     }
   });
 
@@ -147,9 +149,7 @@ export default function MobileSoundField({ modelCenter }: { modelCenter: React.R
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
-            count={particlePositions.length / 3}
-            array={particlePositions}
-            itemSize={3}
+            args={[particlePositions, 3]}
           />
         </bufferGeometry>
         <pointsMaterial

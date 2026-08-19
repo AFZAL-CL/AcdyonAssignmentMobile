@@ -25,8 +25,8 @@ export default function Home() {
     },
     { 
       id: 'midnight', name: 'Midnight', 
-      primary: '#171820', secondary: '#f9f1f1ff', detail: '#9ea9ddff', 
-      accentColor: '#a7a3a3ff', accentSoft: 'rgba(225, 219, 219, 0.2)' 
+      primary: '#171820', secondary: '#f9f1f1', detail: '#9ea9dd', 
+      accentColor: '#a7a3a3', accentSoft: 'rgba(225, 219, 219, 0.2)' 
     },
     { 
       id: 'forest', name: 'Forest', 
@@ -404,7 +404,7 @@ export default function Home() {
       </div>
 
       {/* SECTION 3: PRODUCT FEATURES SHOWCASE (Phase 7) */}
-      <div ref={section4Ref} className="absolute inset-0 z-30 pointer-events-none overflow-hidden flex flex-col justify-end pb-[1vh] lg:pb-[2vh]">
+      <div ref={section4Ref} className="absolute inset-0 z-30 pointer-events-none overflow-hidden flex flex-col justify-end pb-[1vh] md:pb-[4vh] xl:pb-[6vh]">
         
         {/* === DESKTOP CONTENT (Hidden on mobile) === */}
         <div className="hidden md:flex flex-col items-center w-full h-full justify-end">
@@ -536,19 +536,43 @@ export default function Home() {
       <div ref={section5Ref} className="absolute inset-0 z-30 flex flex-col-reverse md:flex-row opacity-0 pointer-events-none overflow-hidden" style={{ '--accent': activeVariant.accentColor, '--accent-soft': activeVariant.accentSoft } as React.CSSProperties}>
         
         {/* LEFT: Configurator UI */}
-        <div className="w-full md:w-1/2 h-auto min-h-[50vh] md:h-full flex items-start md:items-center justify-center md:justify-end md:pr-[5vw] xl:pr-[8vw] z-40 bg-gradient-to-b md:bg-gradient-to-r from-[var(--background)] via-[var(--background)] to-transparent overflow-y-auto pb-8 md:pb-0">
-          <div ref={configContentRef} className="w-full max-w-sm px-6 opacity-0 flex flex-col pt-4 md:pt-0 pointer-events-auto">
+        <div className="w-full md:w-1/2 h-auto min-h-[50vh] md:h-full flex items-start md:items-center justify-center md:justify-end md:pr-[5vw] xl:pr-[8vw] z-40 bg-gradient-to-b md:bg-gradient-to-r from-[var(--background)] via-[var(--background)] to-transparent max-md:overflow-visible overflow-y-auto pb-4 md:pb-0">
+          <div ref={configContentRef} className="w-full max-w-sm px-6 opacity-0 flex flex-col pt-2 md:pt-0 pointer-events-auto relative max-md:pb-4 max-md:pt-2 max-md:-translate-y-8">
             
-            <p className="text-[10px] font-bold tracking-[0.3em] uppercase mb-4" style={{ color: 'var(--accent)' }}>SONA / 01</p>
-            <h2 className="text-4xl md:text-5xl font-black leading-none tracking-tighter text-foreground mb-3">SONA ONE</h2>
-            <p className="text-sm text-muted font-medium tracking-wide mb-6">Immersive wireless audio engineered for movement.</p>
+            {/* Technical Panel Styling (Mobile + Desktop) */}
+            <div className="absolute inset-x-2 md:-inset-x-6 inset-y-0 md:-inset-y-8 pointer-events-none -z-10">
+               {/* Subtle background and Outer border */}
+               <div className="absolute inset-0 bg-foreground/[0.015] border border-foreground/10" />
+               
+               {/* Inner border */}
+               <div className="absolute inset-[3px] border border-foreground/[0.03]" />
+               
+               {/* Corner Accents */}
+               <div className="absolute top-0 left-0 w-3 h-3 border-t-[1.5px] border-l-[1.5px] border-foreground/30" />
+               <div className="absolute top-0 right-0 w-3 h-3 border-t-[1.5px] border-r-[1.5px] border-foreground/30" />
+               <div className="absolute bottom-0 left-0 w-3 h-3 border-b-[1.5px] border-l-[1.5px] border-foreground/30" />
+               <div className="absolute bottom-0 right-0 w-3 h-3 border-b-[1.5px] border-r-[1.5px] border-foreground/30" />
+               
+               {/* Red Accents (Sparingly) */}
+               <div className="absolute top-0 left-0 w-[5px] h-[5px] bg-coral" /> 
+               <div className="absolute bottom-0 right-0 w-[5px] h-[5px] bg-coral" />
+               
+               {/* Tiny Technical Label */}
+               <div className="absolute -top-[4px] left-6 px-1.5 bg-[var(--background)] flex items-center">
+                 <span className="text-[6.5px] font-black tracking-[0.2em] text-foreground/40 uppercase leading-none">SYS.PANEL // 01</span>
+               </div>
+            </div>
             
-            <p className="text-2xl md:text-3xl font-black tracking-tight text-foreground mb-8">₹24,999</p>
+            <p className="text-[10px] font-bold tracking-[0.3em] uppercase mb-1 md:mb-4 relative" style={{ color: 'var(--accent)' }}>SONA / 01</p>
+            <h2 className="text-4xl md:text-5xl font-black leading-none tracking-tighter text-foreground mb-1 md:mb-3">SONA ONE</h2>
+            <p className="text-xs md:text-sm text-muted font-medium tracking-wide mb-2 md:mb-6 leading-snug">Immersive wireless audio engineered for movement.</p>
+            
+            <p className="text-xl md:text-3xl font-black tracking-tight text-foreground mb-3 md:mb-8">₹24,999</p>
 
             {/* SIZE */}
-            <div className="mb-6">
-              <p className="text-[10px] font-bold tracking-widest text-foreground uppercase mb-3">SIZE</p>
-              <div className="flex gap-3">
+            <div className="mb-2 md:mb-6">
+              <p className="text-[9px] md:text-[10px] font-bold tracking-widest text-foreground uppercase mb-1 md:mb-3">SIZE</p>
+              <div className="flex gap-2 md:gap-3">
                 {['S', 'M', 'L'].map(size => (
                   <button 
                     key={size}
@@ -567,9 +591,9 @@ export default function Home() {
             </div>
 
             {/* COLOR */}
-            <div className="mb-6">
-              <p className="text-[10px] font-bold tracking-widest text-foreground uppercase mb-3">COLOR <span className="text-muted ml-2">{activeVariant.name}</span></p>
-              <div className="flex gap-4">
+            <div className="mb-2 md:mb-6">
+              <p className="text-[9px] md:text-[10px] font-bold tracking-widest text-foreground uppercase mb-1 md:mb-3">COLOR <span className="text-muted ml-2">{activeVariant.name}</span></p>
+              <div className="flex gap-3 md:gap-4">
                 {VARIANTS.map((variant, idx) => (
                   <button 
                     key={variant.id}
@@ -589,8 +613,8 @@ export default function Home() {
             </div>
 
             {/* QUANTITY */}
-            <div className="mb-10">
-              <p className="text-[10px] font-bold tracking-widest text-foreground uppercase mb-3">QUANTITY</p>
+            <div className="mb-3 md:mb-10">
+              <p className="text-[9px] md:text-[10px] font-bold tracking-widest text-foreground uppercase mb-1 md:mb-3">QUANTITY</p>
               <div className="flex items-center gap-4 border border-foreground/15 w-max px-2 py-1">
                 <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="w-8 h-8 flex items-center justify-center text-foreground hover:bg-foreground/5 transition-colors">
                   −
@@ -603,7 +627,7 @@ export default function Home() {
             </div>
 
             {/* ACTIONS */}
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2 md:gap-3">
               <button 
                 className="w-full py-4 text-xs font-black tracking-widest uppercase transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl"
                 style={{ backgroundColor: 'var(--accent)', color: '#FFF', boxShadow: `0 10px 25px var(--accent-soft)` }}
@@ -611,7 +635,7 @@ export default function Home() {
                 Buy Now
               </button>
               <button 
-                className="w-full py-4 border text-xs font-black tracking-widest uppercase text-foreground transition-all duration-300 transform hover:-translate-y-1 hover:bg-foreground hover:text-[var(--background)]"
+                className="w-full py-4 border text-xs font-black tracking-widest uppercase text-foreground transition-all duration-300 transform hover:-translate-y-1 hover:bg-foreground hover:text-[var(--background)] max-md:hidden"
                 style={{ borderColor: 'var(--accent)' }}
               >
                 Add To Cart
