@@ -180,7 +180,11 @@ function CameraController() {
 export default function ProductScene({ activeVariant }: ProductSceneProps) {
   return (
     <div className="w-full h-full absolute inset-0 z-20 pointer-events-none">
-      <Canvas shadows={{ type: THREE.PCFShadowMap }} dpr={[1, 2]}>
+      <Canvas 
+        shadows={{ type: THREE.PCFShadowMap }} 
+        dpr={[1, 2]}
+        style={{ pointerEvents: 'none', touchAction: 'pan-y' }}
+      >
         <CameraController />
 
         {/* Soft studio-lighting setup for premium illustration feel */}
