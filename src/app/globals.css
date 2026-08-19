@@ -40,3 +40,17 @@ canvas {
   pointer-events: none !important;
   touch-action: pan-y !important;
 }
+
+@keyframes soundWave {
+  0%, 100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.animate-sound-wave {
+  animation: soundWave 1.2s ease-in-out infinite;
+  transform-origin: bottom;
+}

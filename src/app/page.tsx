@@ -60,7 +60,9 @@ export default function Home() {
   const designTextLine1Ref = useRef<HTMLSpanElement>(null);
   const designTextLine2Ref = useRef<HTMLSpanElement>(null);
   const designTextLine3Ref = useRef<HTMLSpanElement>(null);
+  const soundWaveContainerRef = useRef<HTMLDivElement>(null);
   const designSubtextRef = useRef<HTMLParagraphElement>(null);
+  const mobileFillerRef = useRef<HTMLDivElement>(null);
   const spec1Ref = useRef<HTMLDivElement>(null);
   const spec2Ref = useRef<HTMLDivElement>(null);
   const spec3Ref = useRef<HTMLDivElement>(null);
@@ -76,6 +78,9 @@ export default function Home() {
   const feature3Ref = useRef<HTMLDivElement>(null);
   const feature4Ref = useRef<HTMLDivElement>(null);
   const feature5Ref = useRef<HTMLDivElement>(null);
+  const mobileS3IntroRef = useRef<HTMLDivElement>(null);
+  const mobileS3TitleRef = useRef<HTMLHeadingElement>(null);
+  const mobileS3DescRef = useRef<HTMLParagraphElement>(null);
 
   // Phase 8 Refs (Configurator)
   const section5Ref = useRef<HTMLDivElement>(null);
@@ -143,10 +148,12 @@ export default function Home() {
     // Start at 1.0
     scrollTl.to(revealContentRef.current, { y: -50, opacity: 0, duration: 0.1 }, 1.0);
     scrollTl.fromTo(section2Ref.current, { opacity: 0 }, { opacity: 1, duration: 0.1 }, 1.1);
+    scrollTl.fromTo(soundWaveContainerRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 1.15);
     scrollTl.fromTo(designTextLine1Ref.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 1.2);
     scrollTl.fromTo(designTextLine2Ref.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 1.25);
     scrollTl.fromTo(designTextLine3Ref.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 1.3);
     scrollTl.fromTo(designSubtextRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 1.35);
+    scrollTl.fromTo(mobileFillerRef.current, { y: 20, opacity: 0, scale: 0.8 }, { y: 0, opacity: 1, scale: 1, duration: 0.1 }, 1.375);
     scrollTl.fromTo([spec1Ref.current, spec2Ref.current, spec3Ref.current],
       { opacity: 0, scale: 0.9, x: 20 }, { opacity: 1, scale: 1, x: 0, ease: "back.out(1.2)", duration: 0.15, stagger: 0.05 }, 1.4
     );
@@ -157,15 +164,20 @@ export default function Home() {
     scrollTl.to(section2Ref.current, { opacity: 0, duration: 0.1 }, 2.0);
     scrollTl.fromTo(section4Ref.current, { opacity: 0 }, { opacity: 1, duration: 0.1 }, 2.1);
     scrollTl.fromTo(soundWavesRef.current, { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.1 }, 2.15);
-    scrollTl.fromTo(soundTextLine1Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 2.2);
+    // scrollTl.fromTo(soundTextLine1Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 2.2);
     scrollTl.fromTo(soundTextLine2Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 2.25);
     scrollTl.fromTo(soundTextLine3Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 2.3);
     scrollTl.fromTo(feature1Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 2.35);
     
     // Animate the 4 horizontal features
     scrollTl.fromTo([feature2Ref.current, feature3Ref.current, feature4Ref.current, feature5Ref.current], 
-      { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1, stagger: 0.05 }, 2.4);
-    
+      { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.2, stagger: 0.1 }, 2.45
+    );
+    scrollTl.fromTo(mobileS3IntroRef.current, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.1 }, 2.15);
+    scrollTl.fromTo(mobileS3TitleRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.1 }, 2.6);
+    scrollTl.fromTo(mobileS3DescRef.current, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.1 }, 2.65);
+
+    // End Phase 7
     scrollTl.to({}, { duration: 0.2 }, 2.9);
 
     // --- PHASE 8: PRODUCT CONFIGURATOR (Time 3.0 to 4.0) ---
@@ -315,7 +327,7 @@ export default function Home() {
       </div>
 
       {/* Product Reveal Overlay (Phase 3 & 4) */}
-      <div ref={revealContentRef} className="absolute inset-0 z-30 flex flex-col justify-end items-center pb-[8vh] pointer-events-none">
+      <div ref={revealContentRef} className="absolute inset-0 z-30 flex flex-col justify-end items-center pb-[8vh] max-[390px]:pb-[13vh] pointer-events-none">
         <div className="text-center">
           <h2 className="text-4xl md:text-6xl font-black leading-[0.9] tracking-tighter text-foreground flex flex-col items-center">
             <span ref={revealLine1Ref} className="block opacity-0">ENGINEERED</span>
@@ -332,152 +344,191 @@ export default function Home() {
       {/* SECTION 2: PRODUCT DESIGN REVEAL (Phase 5) */}
       <div ref={section2Ref} className="absolute inset-0 z-30 flex flex-col md:flex-row items-center pointer-events-none px-8 md:px-24">
         {/* Left Side Typography */}
-        <div className="flex-1 flex flex-col justify-center items-start pt-32 md:pt-0">
+        <div className="flex-1 w-full flex flex-col justify-end pb-16 max-[390px]:pb-[12vh] md:justify-center md:pb-0 items-start">
+          {/* Sound Wave Animation */}
+          <div ref={soundWaveContainerRef} className="flex items-end gap-1.5 mb-6 opacity-0">
+             <div className="w-1.5 h-4 bg-coral rounded-full animate-sound-wave" style={{ animationDelay: '0.0s' }} />
+             <div className="w-1.5 h-8 bg-coral rounded-full animate-sound-wave" style={{ animationDelay: '0.2s' }} />
+             <div className="w-1.5 h-5 bg-coral rounded-full animate-sound-wave" style={{ animationDelay: '0.4s' }} />
+             <div className="w-1.5 h-9 bg-coral rounded-full animate-sound-wave" style={{ animationDelay: '0.1s' }} />
+             <div className="w-1.5 h-6 bg-coral rounded-full animate-sound-wave" style={{ animationDelay: '0.3s' }} />
+          </div>
+
           <h2 className="text-5xl md:text-7xl lg:text-[7vw] font-black leading-[0.9] tracking-tighter text-foreground flex flex-col">
             <span ref={designTextLine1Ref} className="opacity-0">DESIGNED</span>
             <span ref={designTextLine2Ref} className="text-coral opacity-0">TO BE</span>
             <span ref={designTextLine3Ref} className="opacity-0">HEARD.</span>
           </h2>
-          <p ref={designSubtextRef} className="mt-8 text-muted max-w-sm font-medium tracking-wide opacity-0">
+
+          <p ref={designSubtextRef} className="mt-6 md:mt-8 text-muted max-w-sm font-medium tracking-wide opacity-0 text-sm md:text-base">
             Precision-built for immersive sound, comfort, and movement.
           </p>
+
+          {/* Mobile Bottom Filler */}
+          <div ref={mobileFillerRef} className="mt-8 w-full md:hidden opacity-0 pointer-events-auto pr-6">
+             <div className="w-full py-4 border-t border-b border-foreground/10 flex items-center justify-between group">
+                <span className="font-sans text-[10px] font-bold tracking-[0.2em] uppercase text-foreground">Explore Features</span>
+                <svg viewBox="0 0 24 24" className="w-4 h-4 animate-bounce text-coral" fill="none" stroke="currentColor" strokeWidth="2">
+                   <path d="M12 5v14M5 12l7 7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+             </div>
+          </div>
         </div>
 
         {/* Right Side Callouts (Appears around the headphone) */}
-        <div className="flex-1 relative h-full hidden md:block">
-           <div ref={spec1Ref} className="absolute top-[30%] left-[10%] flex items-center gap-4 opacity-0">
-              <div className="text-right">
+        <div className="flex-1 relative h-full w-full max-[767px]:absolute max-[767px]:inset-0 max-[767px]:z-0 pointer-events-none">
+           <div ref={spec1Ref} className="absolute top-[30%] left-[10%] max-[767px]:top-[10%] max-[767px]:left-0 max-[767px]:w-full max-[767px]:justify-center flex max-[767px]:flex-col items-center gap-4 max-[767px]:gap-2 opacity-0">
+              <div className="text-right max-[767px]:text-center">
                 <p className="text-sm font-black tracking-widest text-foreground">40MM</p>
                 <p className="text-[10px] text-muted font-bold tracking-widest uppercase">Custom Driver</p>
               </div>
-              <div className="w-12 h-[2px] bg-foreground/20 rounded-full" />
+              <div className="w-12 h-[2px] bg-foreground/20 rounded-full max-[767px]:w-8" />
            </div>
            
-           <div ref={spec2Ref} className="absolute top-[55%] right-[5%] flex items-center gap-4 flex-row-reverse opacity-0">
-              <div className="text-left">
+           <div ref={spec2Ref} className="absolute top-[55%] right-[5%] max-[767px]:top-[42%] max-[767px]:right-[6%] flex max-[767px]:flex-col items-center gap-4 max-[767px]:gap-2 flex-row-reverse max-[767px]:flex-col opacity-0">
+              <div className="text-left max-[767px]:text-right">
                 <p className="text-sm font-black tracking-widest text-foreground">ACTIVE</p>
                 <p className="text-[10px] text-muted font-bold tracking-widest uppercase">Noise Control</p>
               </div>
-              <div className="w-12 h-[2px] bg-foreground/20 rounded-full" />
+              <div className="w-12 h-[2px] bg-foreground/20 rounded-full max-[767px]:w-8" />
            </div>
            
-           <div ref={spec3Ref} className="absolute bottom-[20%] left-[20%] flex items-center gap-4 opacity-0">
-              <div className="text-right">
+           <div ref={spec3Ref} className="absolute bottom-[20%] left-[20%] max-[767px]:top-[42%] max-[767px]:bottom-auto max-[767px]:left-[6%] flex max-[767px]:flex-col items-center gap-4 max-[767px]:gap-2 opacity-0">
+              <div className="text-right max-[767px]:text-left">
                 <p className="text-sm font-black tracking-widest text-foreground">24H</p>
                 <p className="text-[10px] text-muted font-bold tracking-widest uppercase">Battery</p>
               </div>
-              <div className="w-12 h-[2px] bg-foreground/20 rounded-full" />
+              <div className="w-12 h-[2px] bg-foreground/20 rounded-full max-[767px]:w-8" />
            </div>
         </div>
       </div>
 
       {/* SECTION 3: PRODUCT FEATURES SHOWCASE (Phase 7) */}
-      <div ref={section4Ref} className="absolute inset-0 z-30 flex flex-col items-center justify-end pb-[1vh] lg:pb-[2vh] pointer-events-none overflow-hidden">
+      <div ref={section4Ref} className="absolute inset-0 z-30 pointer-events-none overflow-hidden flex flex-col justify-end pb-[1vh] lg:pb-[2vh]">
         
-        {/* TOP: Blueprint Rings */}
-        <div ref={soundWavesRef} className="absolute top-[2vh] left-1/2 -translate-x-1/2 flex items-center justify-center opacity-0 -z-10 w-[60vh] h-[60vh] max-w-[700px] max-h-[700px]">
-          {/* Gradient mask to fade out the bottom of the technical lines so they don't compete with typography */}
-          <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-[var(--background)] to-transparent z-10 pointer-events-none" />
-          <svg viewBox="0 0 100 100" className="w-full h-full stroke-foreground/15 stroke-[0.1]" fill="none">
-             {/* Main concentric rings */}
-             <circle cx="50" cy="50" r="45" strokeDasharray="1 2" />
-             <circle cx="50" cy="50" r="35" />
-             <circle cx="50" cy="50" r="25" strokeDasharray="2 4" />
+        {/* === DESKTOP CONTENT (Hidden on mobile) === */}
+        <div className="hidden md:flex flex-col items-center w-full h-full justify-end">
+          {/* TOP: Blueprint Rings */}
+          <div ref={soundWavesRef} className="absolute top-[2vh] left-1/2 -translate-x-1/2 flex items-center justify-center opacity-0 -z-10 w-[60vh] h-[60vh] max-w-[700px] max-h-[700px]">
+            {/* Gradient mask to fade out the bottom of the technical lines so they don't compete with typography */}
+            <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-[var(--background)] to-transparent z-10 pointer-events-none" />
+            <svg viewBox="0 0 100 100" className="w-full h-full stroke-foreground/15 stroke-[0.1]" fill="none">
+               {/* Main concentric rings */}
+               <circle cx="50" cy="50" r="45" strokeDasharray="1 2" />
+               <circle cx="50" cy="50" r="35" />
+               <circle cx="50" cy="50" r="25" strokeDasharray="2 4" />
+               
+               {/* Symmetrical Crosshairs */}
+               <line x1="50" y1="0" x2="50" y2="100" strokeDasharray="2 4" />
+               <line x1="0" y1="50" x2="100" y2="50" strokeDasharray="2 4" />
+               
+               {/* Technical markers exactly matching reference */}
+               <circle cx="85" cy="50" r="2" className="stroke-coral/40" />
+               <circle cx="15" cy="50" r="2" className="stroke-coral/40" />
+               <circle cx="50" cy="15" r="2" className="stroke-coral/40" />
+               <circle cx="50" cy="85" r="2" className="stroke-coral/40" />
+               
+               {/* Outer edge accents */}
+               <path d="M 80 20 L 85 15 M 20 20 L 15 15 M 20 80 L 15 85 M 80 80 L 85 85" className="stroke-coral/40 stroke-[0.2]" />
+               
+               <circle cx="85" cy="15" r="0.5" className="fill-coral" />
+               <circle cx="15" cy="15" r="0.5" className="fill-coral" />
+               <circle cx="15" cy="85" r="0.5" className="fill-coral" />
+               <circle cx="85" cy="85" r="0.5" className="fill-coral" />
+            </svg>
+          </div>
+
+          {/* MIDDLE: Section Title & Description */}
+          <div className="w-full flex flex-col items-center text-center px-6 mb-8 xl:mb-12">
+            <h2 className="text-4xl md:text-5xl lg:text-[4.5vw] font-black leading-[0.9] tracking-tighter text-foreground flex flex-col items-center">
+              <span ref={soundTextLine2Ref} className="opacity-0">ENGINEERED</span>
+              <span ref={soundTextLine3Ref} className="opacity-0">
+                <span className="text-coral">FOR</span> SOUND.
+              </span>
+            </h2>
+            <p ref={feature1Ref} className="mt-6 xl:mt-8 text-muted max-w-lg font-medium tracking-wide opacity-0 text-xs md:text-sm">
+              Every detail matters. Built for pure audio performance, all-day comfort, and a deeper connection to your sound.
+            </p>
+          </div>
+
+          {/* BOTTOM: Four Horizontal Features */}
+          <div className="w-full px-4 md:px-8 lg:px-16 grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-0">
              
-             {/* Symmetrical Crosshairs */}
-             <line x1="50" y1="0" x2="50" y2="100" strokeDasharray="2 4" />
-             <line x1="0" y1="50" x2="100" y2="50" strokeDasharray="2 4" />
+             {/* 01 ERGONOMIC FIT */}
+             <div ref={feature2Ref} className="flex flex-col items-center text-center px-4 md:px-6 opacity-0">
+                <div className="w-16 h-16 rounded-full border border-foreground/15 flex items-center justify-center mb-6 relative">
+                   <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-coral" />
+                   <svg viewBox="0 0 24 24" className="w-8 h-8 stroke-foreground stroke-[1.5]" fill="none">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeDasharray="1 2"/>
+                      <circle cx="12" cy="10" r="3" />
+                   </svg>
+                </div>
+                <p className="text-[10px] font-bold tracking-widest text-coral mb-2">01</p>
+                <h3 className="text-xs lg:text-sm font-black tracking-widest text-foreground uppercase mb-3">ERGONOMIC FIT</h3>
+                <p className="text-xs text-muted leading-relaxed">Designed for all-day comfort and stability.</p>
+             </div>
              
-             {/* Technical markers exactly matching reference */}
-             <circle cx="85" cy="50" r="2" className="stroke-coral/40" />
-             <circle cx="15" cy="50" r="2" className="stroke-coral/40" />
-             <circle cx="50" cy="15" r="2" className="stroke-coral/40" />
-             <circle cx="50" cy="85" r="2" className="stroke-coral/40" />
+             {/* 02 ACTIVE NOISE CONTROL */}
+             <div ref={feature3Ref} className="flex flex-col items-center text-center px-4 md:px-6 md:border-l border-foreground/10 opacity-0">
+                <div className="w-16 h-16 rounded-full border border-foreground/15 flex items-center justify-center mb-6 relative">
+                   <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-coral" />
+                   <svg viewBox="0 0 24 24" className="w-8 h-8 stroke-foreground stroke-[1.5]" fill="none">
+                      <path d="M3 12h3l3-9 5 18 3-9h4" />
+                   </svg>
+                </div>
+                <p className="text-[10px] font-bold tracking-widest text-coral mb-2">02</p>
+                <h3 className="text-xs lg:text-sm font-black tracking-widest text-foreground uppercase mb-3">ACTIVE NOISE CONTROL</h3>
+                <p className="text-xs text-muted leading-relaxed">Blocks distractions and keeps you in the zone.</p>
+             </div>
+
+             {/* 03 PRECISION DRIVER */}
+             <div ref={feature4Ref} className="flex flex-col items-center text-center px-4 md:px-6 md:border-l border-foreground/10 opacity-0">
+                <div className="w-16 h-16 rounded-full border border-foreground/15 flex items-center justify-center mb-6 relative">
+                   <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-coral" />
+                   <svg viewBox="0 0 24 24" className="w-8 h-8 stroke-foreground stroke-[1.5]" fill="none">
+                      <circle cx="12" cy="12" r="8" />
+                      <circle cx="12" cy="12" r="3" className="fill-foreground stroke-foreground" />
+                      <circle cx="12" cy="12" r="1" className="fill-var(--background) stroke-var(--background)" />
+                   </svg>
+                </div>
+                <p className="text-[10px] font-bold tracking-widest text-coral mb-2">03</p>
+                <h3 className="text-xs lg:text-sm font-black tracking-widest text-foreground uppercase mb-3">PRECISION DRIVER</h3>
+                <p className="text-xs text-muted leading-relaxed">Custom-tuned 40mm dynamic driver for powerful clarity.</p>
+             </div>
              
-             {/* Outer edge accents */}
-             <path d="M 80 20 L 85 15 M 20 20 L 15 15 M 20 80 L 15 85 M 80 80 L 85 85" className="stroke-coral/40 stroke-[0.2]" />
-             
-             <circle cx="85" cy="15" r="0.5" className="fill-coral" />
-             <circle cx="15" cy="15" r="0.5" className="fill-coral" />
-             <circle cx="15" cy="85" r="0.5" className="fill-coral" />
-             <circle cx="85" cy="85" r="0.5" className="fill-coral" />
-          </svg>
+             {/* 04 IMMERSIVE AUDIO */}
+             <div ref={feature5Ref} className="flex flex-col items-center text-center px-4 md:px-6 md:border-l border-foreground/10 opacity-0">
+                <div className="w-16 h-16 rounded-full border border-foreground/15 flex items-center justify-center mb-6 relative">
+                   <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-coral" />
+                   <svg viewBox="0 0 24 24" className="w-8 h-8 stroke-foreground stroke-[1.5]" fill="none">
+                      <path d="M8 12a4 4 0 0 1 8 0 M5 12a7 7 0 0 1 14 0 M2 12a10 10 0 0 1 20 0" strokeLinecap="round" />
+                   </svg>
+                </div>
+                <p className="text-[10px] font-bold tracking-widest text-coral mb-2">04</p>
+                <h3 className="text-xs lg:text-sm font-black tracking-widest text-foreground uppercase mb-3">IMMERSIVE AUDIO</h3>
+                <p className="text-xs text-muted leading-relaxed">Rich, detailed sound with a wide soundstage experience.</p>
+             </div>
+          </div>
         </div>
 
-        {/* MIDDLE: Section Title & Description */}
-        <div className="w-full flex flex-col items-center text-center px-6 mb-8 xl:mb-12">
-          <p ref={soundTextLine1Ref} className="text-[10px] md:text-xs font-bold tracking-[0.3em] text-coral uppercase mb-4 opacity-0">
-            SECTION 03
-          </p>
-          <h2 className="text-4xl md:text-5xl lg:text-[4.5vw] font-black leading-[0.9] tracking-tighter text-foreground flex flex-col items-center">
-            <span ref={soundTextLine2Ref} className="opacity-0">ENGINEERED</span>
-            <span ref={soundTextLine3Ref} className="opacity-0">
-              <span className="text-coral">FOR</span> SOUND.
-            </span>
-          </h2>
-          <p ref={feature1Ref} className="mt-6 xl:mt-8 text-muted max-w-lg font-medium tracking-wide opacity-0 text-xs md:text-sm">
-            Every detail matters. Built for pure audio performance, all-day comfort, and a deeper connection to your sound.
-          </p>
-        </div>
-
-        {/* BOTTOM: Four Horizontal Features */}
-        <div className="w-full px-4 md:px-8 lg:px-16 grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-0">
-           
-           {/* 01 ERGONOMIC FIT */}
-           <div ref={feature2Ref} className="flex flex-col items-center text-center px-4 md:px-6 opacity-0">
-              <div className="w-16 h-16 rounded-full border border-foreground/15 flex items-center justify-center mb-6 relative">
-                 <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-coral" />
-                 <svg viewBox="0 0 24 24" className="w-8 h-8 stroke-foreground stroke-[1.5]" fill="none">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeDasharray="1 2"/>
-                    <circle cx="12" cy="10" r="3" />
-                 </svg>
-              </div>
-              <p className="text-[10px] font-bold tracking-widest text-coral mb-2">01</p>
-              <h3 className="text-xs lg:text-sm font-black tracking-widest text-foreground uppercase mb-3">ERGONOMIC FIT</h3>
-              <p className="text-xs text-muted leading-relaxed">Designed for all-day comfort and stability.</p>
+        {/* === MOBILE CONTENT (SOUND FIELD) === */}
+        <div className="md:hidden flex flex-col items-center justify-between w-full h-full pb-[8vh] pt-[12vh] relative z-20">
+           {/* Top Intro */}
+           <div ref={mobileS3IntroRef} className="text-center w-full opacity-0">
+              <h3 className="font-sans text-[10px] tracking-[0.3em] font-black uppercase text-foreground">
+                SONA / SOUND FIELD
+              </h3>
            </div>
            
-           {/* 02 ACTIVE NOISE CONTROL */}
-           <div ref={feature3Ref} className="flex flex-col items-center text-center px-4 md:px-6 md:border-l border-foreground/10 opacity-0">
-              <div className="w-16 h-16 rounded-full border border-foreground/15 flex items-center justify-center mb-6 relative">
-                 <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-coral" />
-                 <svg viewBox="0 0 24 24" className="w-8 h-8 stroke-foreground stroke-[1.5]" fill="none">
-                    <path d="M3 12h3l3-9 5 18 3-9h4" />
-                 </svg>
-              </div>
-              <p className="text-[10px] font-bold tracking-widest text-coral mb-2">02</p>
-              <h3 className="text-xs lg:text-sm font-black tracking-widest text-foreground uppercase mb-3">ACTIVE NOISE CONTROL</h3>
-              <p className="text-xs text-muted leading-relaxed">Blocks distractions and keeps you in the zone.</p>
+           {/* Bottom Finale */}
+           <div className="text-center w-full">
+              <h2 ref={mobileS3TitleRef} className="text-2xl font-black tracking-tighter text-foreground mb-3 opacity-0">
+                SOUND, WITHOUT LIMITS.
+              </h2>
+              <p ref={mobileS3DescRef} className="text-xs font-medium text-muted tracking-wide opacity-0">
+                Engineered to surround you.
+              </p>
            </div>
-
-           {/* 03 PRECISION DRIVER */}
-           <div ref={feature4Ref} className="flex flex-col items-center text-center px-4 md:px-6 md:border-l border-foreground/10 opacity-0">
-              <div className="w-16 h-16 rounded-full border border-foreground/15 flex items-center justify-center mb-6 relative">
-                 <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-coral" />
-                 <svg viewBox="0 0 24 24" className="w-8 h-8 stroke-foreground stroke-[1.5]" fill="none">
-                    <circle cx="12" cy="12" r="8" />
-                    <circle cx="12" cy="12" r="3" className="fill-foreground stroke-foreground" />
-                    <circle cx="12" cy="12" r="1" className="fill-var(--background) stroke-var(--background)" />
-                 </svg>
-              </div>
-              <p className="text-[10px] font-bold tracking-widest text-coral mb-2">03</p>
-              <h3 className="text-xs lg:text-sm font-black tracking-widest text-foreground uppercase mb-3">PRECISION DRIVER</h3>
-              <p className="text-xs text-muted leading-relaxed">Custom-tuned 40mm dynamic driver for powerful clarity.</p>
-           </div>
-           
-           {/* 04 IMMERSIVE AUDIO */}
-           <div ref={feature5Ref} className="flex flex-col items-center text-center px-4 md:px-6 md:border-l border-foreground/10 opacity-0">
-              <div className="w-16 h-16 rounded-full border border-foreground/15 flex items-center justify-center mb-6 relative">
-                 <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-coral" />
-                 <svg viewBox="0 0 24 24" className="w-8 h-8 stroke-foreground stroke-[1.5]" fill="none">
-                    <path d="M8 12a4 4 0 0 1 8 0 M5 12a7 7 0 0 1 14 0 M2 12a10 10 0 0 1 20 0" strokeLinecap="round" />
-                 </svg>
-              </div>
-              <p className="text-[10px] font-bold tracking-widest text-coral mb-2">04</p>
-              <h3 className="text-xs lg:text-sm font-black tracking-widest text-foreground uppercase mb-3">IMMERSIVE AUDIO</h3>
-              <p className="text-xs text-muted leading-relaxed">Rich, detailed sound with a wide soundstage experience.</p>
-           </div>
-
         </div>
       </div>
       

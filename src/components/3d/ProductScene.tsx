@@ -4,6 +4,7 @@ import React, { Suspense, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { ContactShadows, PerspectiveCamera } from '@react-three/drei';
 import HeadphoneModel from './HeadphoneModel';
+import MobileSoundField from './MobileSoundField';
 import { getScrollProgress } from '@/lib/scrollStore';
 import * as THREE from 'three';
 
@@ -24,6 +25,7 @@ function CameraController({ actualVisualCenter }: { actualVisualCenter: React.Re
     if (!cameraRef.current) return;
 
     const isMobile = state.size.width < 768;
+    const isSmallMobile = state.size.width <= 390;
 
     let targetX = 0;
     let targetY = -0.7; // Start camera lower so model appears higher
@@ -47,22 +49,29 @@ function CameraController({ actualVisualCenter }: { actualVisualCenter: React.Re
     // Zoom is a scalar where 1.0 represents the baseline reference distance (Z=7.0)
     const SECTION_FRAMING = {
       desktop: [
-        { x: 0.50, y: 0.57, zoom: 0.82 }, // p=0 (Start)
-        { x: 0.50, y: 0.42, zoom: 1.00 }, // p=1 (Section 1)
-        { x: 0.74, y: 0.49, zoom: 1.00 }, // p=2 (Section 2)
-        { x: 0.50, y: 0.24, zoom: 0.65 }, // p=3 (Section 3 - formerly Section 4)
-        { x: 0.75, y: 0.49, zoom: 1.00 }  // p=4 (Section 4 - formerly Section 5)
+        { x: 0.50, y: 0.37, zoom: 0.82 }, // p=0 (Start)
+        { x: 0.50, y: 0.22, zoom: 1.00 }, // p=1 (Section 1)
+        { x: 0.74, y: 0.29, zoom: 1.00 }, // p=2 (Section 2)
+        { x: 0.50, y: 0.44, zoom: 0.65 }, // p=3 (Section 3 - formerly Section 4)
+        { x: 0.75, y: 0.29, zoom: 1.00 }  // p=4 (Section 4 - formerly Section 5)
       ],
       mobile: [
-        { x: 0.50, y: 0.57, zoom: 0.58 }, // p=0
-        { x: 0.50, y: 0.44, zoom: 0.67 }, // p=1
-        { x: 0.50, y: 0.44, zoom: 0.67 }, // p=2
-        { x: 0.50, y: 0.24, zoom: 0.45 }, // p=3
-        { x: 0.50, y: 0.39, zoom: 0.67 }  // p=4
+        { x: 0.50, y: 0.37, zoom: 0.58 }, // p=0
+        { x: 0.50, y: 0.24, zoom: 0.67 }, // p=1
+        { x: 0.50, y: 0.20, zoom: 0.55 }, // p=2 (Adjusted to leave space for top spec)
+        { x: 0.50, y: 0.43, zoom: 0.50 }, // p=3 (Moved up slightly for Sound Field)
+        { x: 0.50, y: 0.19, zoom: 0.67 }  // p=4
+      ],
+      smallMobile: [
+        { x: 0.50, y: 0.37, zoom: 0.54 }, // p=0
+        { x: 0.50, y: 0.24, zoom: 0.62 }, // p=1
+        { x: 0.50, y: 0.20, zoom: 0.45 }, // p=2 (Adjusted down slightly to fit 40MM top spec)
+        { x: 0.50, y: 0.43, zoom: 0.45 }, // p=3 (Moved up slightly for Sound Field)
+        { x: 0.50, y: 0.19, zoom: 0.62 }  // p=4
       ]
     };
 
-    const layout = isMobile ? SECTION_FRAMING.mobile : SECTION_FRAMING.desktop;
+    const layout = isSmallMobile ? SECTION_FRAMING.smallMobile : (isMobile ? SECTION_FRAMING.mobile : SECTION_FRAMING.desktop);
 
     let viewportX = layout[0].x;
     let viewportY = layout[0].y;
@@ -223,6 +232,8 @@ export default function ProductScene({ activeVariant }: ProductSceneProps) {
               }
             }}
           />
+          
+          <MobileSoundField modelCenter={actualVisualCenter} />
 
           <ContactShadows
             position={[0, -3.5, 0]}
