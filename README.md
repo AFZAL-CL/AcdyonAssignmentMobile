@@ -2,7 +2,7 @@
 
 A highly interactive, 3D-driven web experience built to showcase the fictional SONA ONE premium wireless headphones. This project focuses on cinematic product storytelling, fluid scroll animations, and minimalist architectural design.
 
-![Hero Section](/docs/hero.png)
+![Hero Section](./public/docs/hero.png)
 
 ## Core Features
 
@@ -12,7 +12,7 @@ A highly interactive, 3D-driven web experience built to showcase the fictional S
 - **Intelligent Navigation:** A custom smooth-scroll navigation system that bridges DOM clicks with the GSAP ScrollTrigger timeline, ensuring that jumping between sections never breaks the 3D animation states.
 - **Responsive Architecture:** Distinct mobile and desktop layouts ensure the 3D canvas and typography remain perfectly balanced across all viewports.
 
-![Product Features](/docs/features.png)
+![Product Features](./public/docs/features.png)
 
 ## Technology Stack
 
@@ -22,7 +22,7 @@ A highly interactive, 3D-driven web experience built to showcase the fictional S
 - **Styling:** Tailwind CSS v4
 - **Language:** TypeScript
 
-![Interactive Configurator](/docs/configurator.png)
+![Interactive Configurator](./public/docs/configurator.png)
 
 ## Architecture Details
 
