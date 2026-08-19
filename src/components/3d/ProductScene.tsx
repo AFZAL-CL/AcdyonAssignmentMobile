@@ -26,19 +26,19 @@ function CameraController() {
     const isMobile = window.innerWidth < 768;
 
     let targetX = 0;
-    let targetY = 0;
+    let targetY = -0.7; // Start camera lower so model appears higher
     let targetZ = 8.5;
     let targetLookX = 0;
-    let targetLookY = 0;
+    let targetLookY = -0.7;
 
-    const getMoveP = (localP: number) => Math.min(localP / 0.75, 1.0);
+    const getMoveP = (localP: number) => Math.min(localP / 0.4, 1.0);
 
     // Phase 1 (0 to 1.0)
     let p1 = Math.min(Math.max(p, 0), 1.0);
     let m1 = getMoveP(p1);
     targetZ = 8.5 - 1.5 * m1;
-    targetY = -2.1 * m1;
-    targetLookY = -2.1 * m1;
+    targetY = -0.7 - 1.4 * m1; // Transition from -0.7 to -2.1
+    targetLookY = -0.7 - 1.4 * m1;
 
     // Phase 2 (1.0 to 2.0)
     if (p > 1.0) {
@@ -120,7 +120,7 @@ function CameraController() {
 export default function ProductScene({ activeVariant }: ProductSceneProps) {
   return (
     <div className="w-full h-full absolute inset-0 z-20 pointer-events-none">
-      <Canvas shadows dpr={[1, 2]}>
+      <Canvas shadows={{ type: THREE.PCFShadowMap }} dpr={[1, 2]}>
         <CameraController />
 
         {/* Soft studio-lighting setup for premium illustration feel */}

@@ -32,6 +32,8 @@ export default function HeadphoneModel({ activeVariant, ...props }: HeadphoneMod
     uDetail: { value: new THREE.Color(detailColor) },
     uMix: { value: 0.0 }
   });
+  
+  const timeRef = useRef(0);
 
   useEffect(() => {
     scene.traverse((child) => {
@@ -97,15 +99,16 @@ export default function HeadphoneModel({ activeVariant, ...props }: HeadphoneMod
     });
   }, [scene]);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (group.current && innerGroup.current) {
+      timeRef.current += delta;
       const p = getScrollProgress();
       
       let baseRotY = 0;
       let targetRotationX = 0;
 
-      const getMoveP = (localP: number) => Math.min(localP / 0.75, 1.0);
-      const getSpinP = (localP: number) => Math.min(Math.max(localP - 0.75, 0) / 0.15, 1.0);
+      const getMoveP = (localP: number) => Math.min(localP / 0.4, 1.0);
+      const getSpinP = (localP: number) => Math.min(Math.max(localP - 0.85, 0) / 0.15, 1.0);
 
       // Section 1 (0 to 1.0)
       let p1 = Math.min(Math.max(p, 0), 1.0);
@@ -149,7 +152,7 @@ export default function HeadphoneModel({ activeVariant, ...props }: HeadphoneMod
         baseRotY += (Math.PI * 2) * s5;
       }
       
-      const idleRot = state.clock.elapsedTime * 0.05;
+      const idleRot = timeRef.current * 0.05;
       
       group.current.rotation.y = THREE.MathUtils.lerp(
         group.current.rotation.y, 
@@ -158,7 +161,7 @@ export default function HeadphoneModel({ activeVariant, ...props }: HeadphoneMod
       );
       group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, targetRotationX, 0.05);
       
-      innerGroup.current.position.y = Math.sin(state.clock.elapsedTime * 1.5) * 0.05;
+      innerGroup.current.position.y = Math.sin(timeRef.current * 1.5) * 0.05;
       
       const isRed = primaryColor.toUpperCase() === '#FF4D4D';
       shaderUniforms.current.uMix.value = THREE.MathUtils.lerp(shaderUniforms.current.uMix.value, isRed ? 0.0 : 1.0, 0.1);
