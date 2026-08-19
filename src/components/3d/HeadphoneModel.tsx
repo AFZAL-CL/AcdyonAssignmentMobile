@@ -10,9 +10,10 @@ interface HeadphoneModelProps extends React.ComponentProps<'group'> {
     secondary: string;
     detail: string;
   };
+  onBoundsCalculated?: (center: THREE.Vector3, size: THREE.Vector3) => void;
 }
 
-export default function HeadphoneModel({ activeVariant, ...props }: HeadphoneModelProps) {
+export default function HeadphoneModel({ activeVariant, onBoundsCalculated, ...props }: HeadphoneModelProps) {
   const group = useRef<THREE.Group>(null);
   const innerGroup = useRef<THREE.Group>(null);
   
@@ -97,7 +98,17 @@ export default function HeadphoneModel({ activeVariant, ...props }: HeadphoneMod
         }
       }
     });
-  }, [scene]);
+
+    if (onBoundsCalculated && innerGroup.current) {
+      innerGroup.current.updateMatrixWorld(true);
+      const box = new THREE.Box3().setFromObject(innerGroup.current);
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+      const size = new THREE.Vector3();
+      box.getSize(size);
+      onBoundsCalculated(center, size);
+    }
+  }, [scene, onBoundsCalculated]);
 
   useFrame((state, delta) => {
     if (group.current && innerGroup.current) {
@@ -108,17 +119,18 @@ export default function HeadphoneModel({ activeVariant, ...props }: HeadphoneMod
         0,                                                  // Start
         Math.PI,                                            // Sec 1
         Math.PI + Math.PI / 3,                              // Sec 2
-        Math.PI + Math.PI / 3,                              // Sec 3
-        Math.PI + Math.PI / 3 + Math.PI / 1.5,              // Sec 4
-        Math.PI + Math.PI / 3 + Math.PI / 1.5 + Math.PI / 6 // Sec 5
+        Math.PI + Math.PI / 3 + Math.PI / 1.5,              // Sec 3 (formerly Sec 4)
+        Math.PI + Math.PI / 3 + Math.PI / 1.5 + Math.PI / 6 // Sec 4 (formerly Sec 5)
       ];
 
       const easeInOutCubic = (x: number): number => {
         return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
       };
 
-      const sectionIdx = Math.min(Math.floor(p), 4);
-      const localP = Math.min(Math.max(p - sectionIdx, 0), 1);
+      // Clamp section calculation so the model stays in Phase 5 orientation during Phase 6
+      const clampedP = Math.min(p, 4.0);
+      const sectionIdx = Math.min(Math.floor(clampedP), 3);
+      const localP = Math.min(Math.max(clampedP - sectionIdx, 0), 1);
 
       const prevRot = SECTION_CONFIG[sectionIdx];
       const nextRot = SECTION_CONFIG[sectionIdx + 1];
@@ -135,8 +147,45 @@ export default function HeadphoneModel({ activeVariant, ...props }: HeadphoneMod
       const spinRot = easeInOutCubic(spinProgress) * Math.PI * 2;
       const completedSpins = sectionIdx * Math.PI * 2;
 
-      const absoluteTargetRotY = targetBaseRot + spinRot + completedSpins;
+      let absoluteTargetRotY = targetBaseRot + spinRot + completedSpins;
       let targetRotationX = 0;
+
+      // --- SECTION 6 CINEMATIC STRAIGHTEN (p: 4.00 -> 4.30) ---
+      if (p > 4.0) {
+        // Calculate the base target at exactly p=4.0
+        const baseRotP4 = SECTION_CONFIG[4] + 3 * Math.PI * 2;
+        
+        // Since 8.5 PI (270 deg) was an edge-on view, 8.0 PI (0 deg modulo 2PI) is likely the front view.
+        // We calculate the precise rotation progress, locking it completely at p >= 4.30
+        const frontFacingAngle = 8.0 * Math.PI; 
+        
+        const transitionP = Math.min((p - 4.0) / 0.30, 1.0);
+        const smoothP = easeInOutCubic(transitionP);
+        
+        absoluteTargetRotY = THREE.MathUtils.lerp(baseRotP4, frontFacingAngle, smoothP);
+      }
+
+      // --- SECTION 6 SCALE OVERRIDE ---
+      let targetScale = 1.0;
+      if (p > 4.40) {
+        // Initial Scale (4.40 -> 4.60)
+        const initialScaleP = Math.min((p - 4.40) / 0.20, 1.0);
+        const smoothInitialScale = easeInOutCubic(initialScaleP);
+        targetScale = THREE.MathUtils.lerp(1.0, 2.5, smoothInitialScale);
+        
+        // Continuous Zoom (4.80 -> 5.30)
+        if (p > 4.80) {
+          const zoomP = Math.min((p - 4.80) / 0.50, 1.0);
+          // Exponential growth so it accelerates as it gets closer
+          const smoothZoom = zoomP * zoomP * zoomP;
+          targetScale = THREE.MathUtils.lerp(2.5, 40.0, smoothZoom);
+        }
+      }
+
+      // --- SECTION 6 PERMANENT HIDDEN STATE ---
+      const SECTION_6_END = 5.30;
+      const section6Finished = p >= SECTION_6_END;
+      group.current.visible = !section6Finished;
 
       // Double smoothing fix (replace fixed 0.05 lerp with exp decay)
       const dampSpeed = 25;
@@ -153,8 +202,15 @@ export default function HeadphoneModel({ activeVariant, ...props }: HeadphoneMod
         1 - Math.exp(-dampSpeed * delta)
       );
       
+      group.current.scale.lerp(
+        new THREE.Vector3(targetScale, targetScale, targetScale), 
+        1 - Math.exp(-dampSpeed * delta)
+      );
+      
       // Floating idle animation kept but decoupled from orientation
-      innerGroup.current.position.y = Math.sin(timeRef.current * 1.5) * 0.05;
+      // For Section 6, we completely stop the idle floating so the product settles
+      const idleAmplitude = p > 4.30 ? 0.0 : 0.05;
+      innerGroup.current.position.y = Math.sin(timeRef.current * 1.5) * idleAmplitude;
       
       const colorDampSpeed = 15;
       const isRed = primaryColor.toUpperCase() === '#FF4D4D';

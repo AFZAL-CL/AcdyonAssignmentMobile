@@ -65,18 +65,6 @@ export default function Home() {
   const spec2Ref = useRef<HTMLDivElement>(null);
   const spec3Ref = useRef<HTMLDivElement>(null);
 
-  // Phase 6 Refs (Engineered For Sound)
-  const section3Ref = useRef<HTMLDivElement>(null);
-  const engTextLine1Ref = useRef<HTMLSpanElement>(null);
-  const engTextLine2Ref = useRef<HTMLSpanElement>(null);
-  const engTextLine3Ref = useRef<HTMLSpanElement>(null);
-  const engSubtextRef = useRef<HTMLParagraphElement>(null);
-  const blueprintRef = useRef<HTMLDivElement>(null);
-  const anno1Ref = useRef<HTMLDivElement>(null);
-  const anno2Ref = useRef<HTMLDivElement>(null);
-  const anno3Ref = useRef<HTMLDivElement>(null);
-  const anno4Ref = useRef<HTMLDivElement>(null);
-
   // Phase 7 Refs (Product Features Showcase)
   const section4Ref = useRef<HTMLDivElement>(null);
   const soundTextLine1Ref = useRef<HTMLParagraphElement>(null);
@@ -92,6 +80,12 @@ export default function Home() {
   // Phase 8 Refs (Configurator)
   const section5Ref = useRef<HTMLDivElement>(null);
   const configContentRef = useRef<HTMLDivElement>(null);
+
+  // Phase 9 Refs (Section 6 - Closing)
+  const section6Ref = useRef<HTMLDivElement>(null);
+  const s6HeadlineRef = useRef<HTMLHeadingElement>(null);
+  const s6SubtextRef = useRef<HTMLParagraphElement>(null);
+  const s6CtaRef = useRef<HTMLButtonElement>(null);
 
   // Footer Refs
   const footerRef = useRef<HTMLElement>(null);
@@ -115,9 +109,9 @@ export default function Home() {
     gsap.to(".scroll-arrow", { y: 8, repeat: -1, yoyo: true, ease: "power1.inOut", duration: 1.5, delay: 3.5 });
 
     const isMobile = window.innerWidth < 768;
-    const DESKTOP_SCROLL_DIST = window.innerHeight * 12;
-    const MOBILE_SCROLL_DIST = window.innerHeight * 8;
-    const DESKTOP_SCRUB = 1;
+    const DESKTOP_SCROLL_DIST = window.innerHeight * 15;
+    const MOBILE_SCROLL_DIST = window.innerHeight * 12;
+    const DESKTOP_SCRUB = 0.5;
     const MOBILE_SCRUB = 0.5;
 
     // --- 2. SCROLL DRIVEN ANIMATION (Scrubbed) ---
@@ -129,7 +123,7 @@ export default function Home() {
         scrub: isMobile ? MOBILE_SCRUB : DESKTOP_SCRUB,
         pin: true,
         onUpdate: (self) => {
-          setScrollProgress(self.progress * 5.0);
+          setScrollProgress(self.progress * 5.4);
         }
       }
     });
@@ -158,51 +152,52 @@ export default function Home() {
     );
     scrollTl.to({}, { duration: 0.2 }, 1.8);
 
-    // --- PHASE 6: ENGINEERED FOR SOUND (Time 2.0 to 3.0) ---
+    // --- PHASE 7: PRODUCT FEATURES SHOWCASE (Time 2.0 to 3.0) ---
     // Start at 2.0
     scrollTl.to(section2Ref.current, { opacity: 0, duration: 0.1 }, 2.0);
-    scrollTl.fromTo(section3Ref.current, { opacity: 0 }, { opacity: 1, duration: 0.1 }, 2.1);
-    scrollTl.fromTo(blueprintRef.current, { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.1 }, 2.15);
-    scrollTl.fromTo(engTextLine1Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 2.2);
-    scrollTl.fromTo(engTextLine2Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 2.25);
-    scrollTl.fromTo(engTextLine3Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 2.3);
-    scrollTl.fromTo(engSubtextRef.current, { opacity: 0 }, { opacity: 1, duration: 0.1 }, 2.35);
-    
-    // Animate feature callouts on right side
-    scrollTl.fromTo(anno1Ref.current, { x: 20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.1 }, 2.4);
-    scrollTl.fromTo(anno2Ref.current, { x: 20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.1 }, 2.42);
-    scrollTl.fromTo(anno3Ref.current, { x: 20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.1 }, 2.44);
-    scrollTl.fromTo(anno4Ref.current, { x: 20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.1 }, 2.46);
-    
-    // Draw lines
-    scrollTl.to('.anno-line', { strokeDashoffset: 0, duration: 0.1, stagger: 0.02 }, 2.4);
-    scrollTl.to('.anno-dot', { opacity: 1, duration: 0.1, stagger: 0.02 }, 2.45);
-
-    // --- PHASE 7: PRODUCT FEATURES SHOWCASE (Time 3.0 to 4.0) ---
-    // Start at 3.0
-    scrollTl.to(section3Ref.current, { opacity: 0, duration: 0.1 }, 3.0);
-    scrollTl.fromTo(section4Ref.current, { opacity: 0 }, { opacity: 1, duration: 0.1 }, 3.1);
-    scrollTl.fromTo(soundWavesRef.current, { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.1 }, 3.15);
-    scrollTl.fromTo(soundTextLine1Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 3.2);
-    scrollTl.fromTo(soundTextLine2Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 3.25);
-    scrollTl.fromTo(soundTextLine3Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 3.3);
-    scrollTl.fromTo(feature1Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 3.35);
+    scrollTl.fromTo(section4Ref.current, { opacity: 0 }, { opacity: 1, duration: 0.1 }, 2.1);
+    scrollTl.fromTo(soundWavesRef.current, { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.1 }, 2.15);
+    scrollTl.fromTo(soundTextLine1Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 2.2);
+    scrollTl.fromTo(soundTextLine2Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 2.25);
+    scrollTl.fromTo(soundTextLine3Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 2.3);
+    scrollTl.fromTo(feature1Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 2.35);
     
     // Animate the 4 horizontal features
     scrollTl.fromTo([feature2Ref.current, feature3Ref.current, feature4Ref.current, feature5Ref.current], 
-      { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1, stagger: 0.05 }, 3.4);
+      { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1, stagger: 0.05 }, 2.4);
     
-    scrollTl.to({}, { duration: 0.2 }, 3.9);
+    scrollTl.to({}, { duration: 0.2 }, 2.9);
 
-    // --- PHASE 8: PRODUCT CONFIGURATOR (Time 4.0 to 5.0) ---
-    // Start at 4.0
-    scrollTl.to(section4Ref.current, { opacity: 0, duration: 0.1 }, 4.0);
-    scrollTl.fromTo(section5Ref.current, { opacity: 0, pointerEvents: 'none' }, { opacity: 1, pointerEvents: 'auto', duration: 0.2 }, 4.2);
+    // --- PHASE 8: PRODUCT CONFIGURATOR (Time 3.0 to 4.0) ---
+    // Start at 3.0
+    scrollTl.to(section4Ref.current, { opacity: 0, duration: 0.1 }, 3.0);
+    scrollTl.fromTo(section5Ref.current, { opacity: 0, pointerEvents: 'none' }, { opacity: 1, pointerEvents: 'auto', duration: 0.2 }, 3.2);
     scrollTl.fromTo(configContentRef.current,
       { x: -50, opacity: 0 },
       { x: 0, opacity: 1, ease: "power2.out", duration: 0.4 },
-      4.4
+      3.4
     );
+
+    // --- PHASE 9: SECTION 6 CLOSING (Time 4.0 to 5.4) ---
+    // Start at 4.0
+    scrollTl.to(section5Ref.current, { opacity: 0, pointerEvents: 'none', duration: 0.1 }, 4.0);
+    scrollTl.to(configContentRef.current, { opacity: 0, x: -50, duration: 0.1 }, 4.0);
+    
+    // Fade in the section container early so it's ready
+    scrollTl.fromTo(section6Ref.current, { opacity: 0, pointerEvents: 'none' }, { opacity: 1, pointerEvents: 'auto', duration: 0.1 }, 4.1);
+    
+    // 4.60 to 4.80: Headline and subtext reveal (Fixed position in center)
+    scrollTl.fromTo(s6HeadlineRef.current, { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.20, ease: "power2.out" }, 4.60);
+    scrollTl.fromTo(s6SubtextRef.current, { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.20, ease: "power2.out" }, 4.60);
+    
+    // 4.70 to 4.80: CTA appears
+    scrollTl.fromTo(s6CtaRef.current, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.10, ease: "power2.out" }, 4.70);
+    
+    // 4.80 to 5.30: CONTINUOUS ZOOM (3D space animation in ProductScene)
+    // The text stays perfectly still.
+    
+    // 5.30 to 5.40: Padding to hold text and transition to footer naturally
+    scrollTl.to({}, { duration: 0.10 }, 5.30);
 
   });
 
@@ -291,6 +286,27 @@ export default function Home() {
             ↓
           </div>
         </div>
+
+      </div>
+
+      {/* --- SECTION 6: PREMIUM CLOSING --- */}
+      <div 
+        ref={section6Ref}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center pointer-events-none opacity-0 w-full px-6 z-50"
+      >
+        <div className="flex flex-col items-center text-center">
+          <h2 ref={s6HeadlineRef} className="text-3xl md:text-5xl lg:text-[4vw] font-black leading-tight tracking-tighter text-foreground opacity-0 drop-shadow-2xl">
+            HEAR DIFFERENT.
+          </h2>
+          
+          <p ref={s6SubtextRef} className="mt-4 text-sm md:text-base text-muted max-w-sm font-medium opacity-0 drop-shadow-lg">
+            Sound designed to stay with you.
+          </p>
+          
+          <button ref={s6CtaRef} className="mt-10 px-8 py-4 bg-foreground text-background font-bold tracking-widest text-xs uppercase hover:scale-105 transition-transform opacity-0 pointer-events-auto shadow-2xl">
+            GET YOURS &rarr;
+          </button>
+        </div>
       </div>
 
       {/* 3D Scene Background */}
@@ -355,90 +371,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* SECTION 3: ENGINEERED FOR SOUND (Phase 6) - STACKED ON MOBILE */}
-      <div ref={section3Ref} className="absolute inset-0 z-30 flex flex-col md:flex-row items-center pointer-events-none overflow-hidden">
-        
-        {/* LEFT 50% COLUMN: Blueprint Graphic */}
-        <div ref={blueprintRef} className="absolute inset-0 md:left-0 md:top-0 md:w-1/2 md:h-full flex items-center justify-center opacity-0 -z-10">
-          <svg viewBox="0 0 100 100" className="w-[80vw] h-[80vw] max-w-[800px] max-h-[800px] stroke-foreground/15 stroke-[0.1]" fill="none">
-             <circle cx="50" cy="50" r="45" strokeDasharray="1 3" />
-             <circle cx="50" cy="50" r="30" strokeDasharray="3 5" className="stroke-coral/30" />
-             <circle cx="50" cy="50" r="10" strokeDasharray="1 3" />
-             <line x1="50" y1="0" x2="50" y2="100" strokeDasharray="2 4" />
-             <line x1="0" y1="50" x2="100" y2="50" strokeDasharray="2 4" />
-             <circle cx="85" cy="15" r="4" className="stroke-coral/20 stroke-[0.1]" />
-          </svg>
-        </div>
-
-        {/* RIGHT 50% COLUMN: Typography & Features */}
-        <div className="relative md:absolute md:right-0 md:top-0 w-full md:w-1/2 h-full flex flex-col justify-end md:justify-center items-center md:items-start text-center md:text-left px-[5vw] xl:px-[8vw] pb-[8vh] md:pb-0">
-          
-          <h2 className="text-4xl md:text-6xl lg:text-[6vw] font-black leading-[0.9] tracking-tighter text-foreground flex flex-col">
-            <span ref={engTextLine1Ref} className="opacity-0">ENGINEERED</span>
-            <span ref={engTextLine2Ref} className="text-coral opacity-0">FOR</span>
-            <span ref={engTextLine3Ref} className="opacity-0">SOUND.</span>
-          </h2>
-          <p ref={engSubtextRef} className="mt-6 text-muted max-w-sm font-medium tracking-wide opacity-0 text-[13px] md:text-sm">
-            Precision-built for immersive sound, comfort, and movement.
-          </p>
-          
-          {/* Vertical Feature Stack on Right Side */}
-          <div className="mt-8 md:mt-12 flex flex-col gap-4 md:gap-8 relative z-10 w-max">
-             
-             {/* 01 ERGONOMIC FIT */}
-             <div ref={anno1Ref} className="relative opacity-0 flex flex-col items-center md:items-start z-10 w-max">
-                <p className="text-xs md:text-sm font-black tracking-widest text-foreground flex items-center justify-center md:justify-start gap-3">
-                  <span className="text-coral flex items-center justify-center w-5 h-5 rounded-full border border-coral/30 text-[9px]">01</span>
-                  ERGONOMIC FIT
-                </p>
-                {/* Connector SVG gently spanning from headphone bounding box to the text */}
-                <svg className="hidden md:block absolute bottom-1/2 right-[100%] mr-4 w-[16vw] h-[4vh] overflow-visible -z-10" viewBox="0 0 100 100" preserveAspectRatio="none">
-                   <path d="M 0 0 L 80 100 L 100 100" pathLength="1" stroke="currentColor" vectorEffect="non-scaling-stroke" strokeWidth="1" fill="none" className="text-foreground/30 anno-line" />
-                   <circle cx="0" cy="0" r="3" className="fill-coral anno-dot opacity-0" />
-                </svg>
-             </div>
-             
-             {/* 02 ACTIVE NOISE CONTROL */}
-             <div ref={anno2Ref} className="relative opacity-0 flex flex-col items-center md:items-start z-10 w-max">
-                <p className="text-xs md:text-sm font-black tracking-widest text-foreground flex items-center justify-center md:justify-start gap-3">
-                  <span className="text-coral flex items-center justify-center w-5 h-5 rounded-full border border-coral/30 text-[9px]">02</span>
-                  ACTIVE NOISE CONTROL
-                </p>
-                <svg className="hidden md:block absolute top-1/2 right-[100%] mr-4 w-[18vw] h-[2vh] overflow-visible -z-10" viewBox="0 0 100 100" preserveAspectRatio="none">
-                   <path d="M 0 100 L 80 0 L 100 0" pathLength="1" stroke="currentColor" vectorEffect="non-scaling-stroke" strokeWidth="1" fill="none" className="text-foreground/30 anno-line" />
-                   <circle cx="0" cy="100" r="3" className="fill-coral anno-dot opacity-0" />
-                </svg>
-             </div>
-             
-             {/* 03 PRECISION DRIVER */}
-             <div ref={anno3Ref} className="relative opacity-0 flex flex-col items-center md:items-start z-10 w-max">
-                <p className="text-xs md:text-sm font-black tracking-widest text-foreground flex items-center justify-center md:justify-start gap-3">
-                  <span className="text-coral flex items-center justify-center w-5 h-5 rounded-full border border-coral/30 text-[9px]">03</span>
-                  PRECISION DRIVER
-                </p>
-                <svg className="hidden md:block absolute top-1/2 right-[100%] mr-4 w-[18vw] h-[3vh] overflow-visible -z-10" viewBox="0 0 100 100" preserveAspectRatio="none">
-                   <path d="M 0 100 L 80 0 L 100 0" pathLength="1" stroke="currentColor" vectorEffect="non-scaling-stroke" strokeWidth="1" fill="none" className="text-foreground/30 anno-line" />
-                   <circle cx="0" cy="100" r="3" className="fill-coral anno-dot opacity-0" />
-                </svg>
-             </div>
-             
-             {/* 04 IMMERSIVE AUDIO */}
-             <div ref={anno4Ref} className="relative opacity-0 flex flex-col items-center md:items-start z-10 w-max">
-                <p className="text-xs md:text-sm font-black tracking-widest text-foreground flex items-center justify-center md:justify-start gap-3">
-                  <span className="text-coral flex items-center justify-center w-5 h-5 rounded-full border border-coral/30 text-[9px]">04</span>
-                  IMMERSIVE AUDIO
-                </p>
-                <svg className="hidden md:block absolute top-1/2 right-[100%] mr-4 w-[16vw] h-[6vh] overflow-visible -z-10" viewBox="0 0 100 100" preserveAspectRatio="none">
-                   <path d="M 0 100 L 80 0 L 100 0" pathLength="1" stroke="currentColor" vectorEffect="non-scaling-stroke" strokeWidth="1" fill="none" className="text-foreground/30 anno-line" />
-                   <circle cx="0" cy="100" r="3" className="fill-coral anno-dot opacity-0" />
-                </svg>
-             </div>
-             
-          </div>
-        </div>
-      </div>
-
-      {/* SECTION 4: PRODUCT FEATURES SHOWCASE (Phase 7) */}
+      {/* SECTION 3: PRODUCT FEATURES SHOWCASE (Phase 7) */}
       <div ref={section4Ref} className="absolute inset-0 z-30 flex flex-col items-center justify-end pb-[1vh] lg:pb-[2vh] pointer-events-none overflow-hidden">
         
         {/* TOP: Blueprint Rings */}
@@ -474,7 +407,7 @@ export default function Home() {
         {/* MIDDLE: Section Title & Description */}
         <div className="w-full flex flex-col items-center text-center px-6 mb-8 xl:mb-12">
           <p ref={soundTextLine1Ref} className="text-[10px] md:text-xs font-bold tracking-[0.3em] text-coral uppercase mb-4 opacity-0">
-            SECTION 04
+            SECTION 03
           </p>
           <h2 className="text-4xl md:text-5xl lg:text-[4.5vw] font-black leading-[0.9] tracking-tighter text-foreground flex flex-col items-center">
             <span ref={soundTextLine2Ref} className="opacity-0">ENGINEERED</span>
@@ -548,7 +481,7 @@ export default function Home() {
         </div>
       </div>
       
-      {/* SECTION 5: PRODUCT CONFIGURATOR (Phase 8) */}
+      {/* SECTION 4: PRODUCT CONFIGURATOR (Phase 8) */}
       <div ref={section5Ref} className="absolute inset-0 z-30 flex flex-col-reverse md:flex-row opacity-0 pointer-events-none overflow-hidden" style={{ '--accent': activeVariant.accentColor, '--accent-soft': activeVariant.accentSoft } as React.CSSProperties}>
         
         {/* LEFT: Configurator UI */}

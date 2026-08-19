@@ -34,3 +34,9 @@ body {
   padding: 0;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Ensure the 3D WebGL Canvas never intercepts native mobile scrolling */
+canvas {
+  pointer-events: none !important;
+  touch-action: pan-y !important;
+}

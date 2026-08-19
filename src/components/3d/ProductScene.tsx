@@ -15,7 +15,7 @@ interface ProductSceneProps {
   };
 }
 
-function CameraController() {
+function CameraController({ actualVisualCenter }: { actualVisualCenter: React.RefObject<THREE.Vector3> }) {
   const cameraRef = useRef<THREE.PerspectiveCamera>(null);
   const lookAtTarget = useRef(new THREE.Vector3(0, 0, 0));
 
@@ -41,124 +41,127 @@ function CameraController() {
       return easeInOutCubic(m);
     };
 
-    // Responsive Desktop Camera Framing
-    let responsiveOffsetY = 0;
+    // SECTION_FRAMING defines the target composition (x, y, zoom) for each section.
+    // X convention: 0.0 = left, 1.0 = right
+    // Y convention: 0.0 = top, 1.0 = bottom (Top-Down)
+    // Zoom is a scalar where 1.0 represents the baseline reference distance (Z=7.0)
+    const SECTION_FRAMING = {
+      desktop: [
+        { x: 0.50, y: 0.57, zoom: 0.82 }, // p=0 (Start)
+        { x: 0.50, y: 0.42, zoom: 1.00 }, // p=1 (Section 1)
+        { x: 0.74, y: 0.49, zoom: 1.00 }, // p=2 (Section 2)
+        { x: 0.50, y: 0.24, zoom: 0.65 }, // p=3 (Section 3 - formerly Section 4)
+        { x: 0.75, y: 0.49, zoom: 1.00 }  // p=4 (Section 4 - formerly Section 5)
+      ],
+      mobile: [
+        { x: 0.50, y: 0.57, zoom: 0.58 }, // p=0
+        { x: 0.50, y: 0.44, zoom: 0.67 }, // p=1
+        { x: 0.50, y: 0.44, zoom: 0.67 }, // p=2
+        { x: 0.50, y: 0.24, zoom: 0.45 }, // p=3
+        { x: 0.50, y: 0.39, zoom: 0.67 }  // p=4
+      ]
+    };
 
-    if (!isMobile) {
-      const REFERENCE_VIEWPORT_HEIGHT = 900;
-      const REFERENCE_ASPECT = 16 / 9;
-      const MIN_VIEWPORT_FACTOR = 0.85;
-      const MAX_VIEWPORT_FACTOR = 1.15;
+    const layout = isMobile ? SECTION_FRAMING.mobile : SECTION_FRAMING.desktop;
 
-      const currentAspect = state.size.width / state.size.height;
+    let viewportX = layout[0].x;
+    let viewportY = layout[0].y;
+    let currentZoom = layout[0].zoom;
+
+    const startIndex = Math.floor(p);
+    
+    if (startIndex >= 0 && startIndex < layout.length - 1) {
+      const endIndex = startIndex + 1;
+      const localP = p - startIndex;
+      const m = getMoveP(Math.min(Math.max(localP, 0), 1.0));
       
-      const heightFactor = THREE.MathUtils.clamp(
-        state.size.height / REFERENCE_VIEWPORT_HEIGHT, 
-        MIN_VIEWPORT_FACTOR, 
-        MAX_VIEWPORT_FACTOR
-      );
+      const start = layout[startIndex];
+      const end = layout[endIndex];
       
-      const aspectFactor = THREE.MathUtils.clamp(
-        currentAspect / REFERENCE_ASPECT, 
-        MIN_VIEWPORT_FACTOR, 
-        MAX_VIEWPORT_FACTOR
-      );
-
-      // If screen is shorter than 900px (heightFactor < 1.0), responsiveOffsetY becomes negative.
-      // A negative offset lowers the camera, pushing the headphone HIGHER on screen to avoid UI overlap.
-      // If screen is taller than 900px, responsiveOffsetY becomes positive, pushing headphone LOWER.
-      const heightAdjustment = (heightFactor - 1.0) * 1.5;
-      
-      // If screen is narrower than 16:9 (aspectFactor < 1.0), we also apply a slight negative offset
-      // because narrower screens make the model appear wider relative to viewport.
-      const aspectAdjustment = (aspectFactor - 1.0) * 0.5;
-
-      responsiveOffsetY = heightAdjustment + aspectAdjustment;
+      viewportX = start.x + (end.x - start.x) * m;
+      viewportY = start.y + (end.y - start.y) * m;
+      currentZoom = start.zoom + (end.zoom - start.zoom) * m;
+    } else if (startIndex >= layout.length - 1) {
+      const end = layout[layout.length - 1];
+      viewportX = end.x;
+      viewportY = end.y;
+      currentZoom = end.zoom;
     }
 
-    // Define vertical framing offsets to balance the composition.
-    // Lower camera Y pushes the headphone higher on the screen.
-    const SEC1_CAM_Y_START = -0.8;
-    const SEC1_CAM_Y_END = -1.9;
-    const SEC2_CAM_Y_END = -1.3;
-    const SEC3_CAM_Y_END = -1.6; // Preserves existing section 3 composition
-    const SEC4_CAM_Y_END = -2.8; // Preserves section 4 gap
-    const SEC5_CAM_Y_END = -1.5;
+    // Calculate camera distance/FOV from the desired visual zoom
+    const BASE_DISTANCE = 7.0;
+    targetZ = BASE_DISTANCE / currentZoom;
 
-    // Phase 1 (0 to 1.0)
-    let p1 = Math.min(Math.max(p, 0), 1.0);
-    let m1 = getMoveP(p1);
-    targetZ = 8.5 - 1.5 * m1;
-    targetY = SEC1_CAM_Y_START + (SEC1_CAM_Y_END - SEC1_CAM_Y_START) * m1;
-    if (!isMobile) targetY += responsiveOffsetY;
+    // Convert Screen-Space Targets to World Coordinates (45 degrees FOV)
+    const vFov = (45 * Math.PI) / 180;
+    
+    // Mathematically exact height and width of the visible world at distance targetZ
+    const visibleHeight = 2 * Math.tan(vFov / 2) * targetZ;
+    const currentAspect = state.size.width / state.size.height;
+    const visibleWidth = visibleHeight * currentAspect;
+
+    if (!actualVisualCenter.current) return;
+    const MODEL_WORLD_Y = actualVisualCenter.current.y;
+    const MODEL_WORLD_X = actualVisualCenter.current.x;
+
+    // --- SECTION 6 CINEMATIC ZOOM OVERRIDE ---
+    // The user explicitly requested strict phase separation:
+    // 4.00 -> 4.25: Rotate only (done in HeadphoneModel). Camera stays perfectly still at p=4 standard framing.
+    // 4.25 -> 4.40: Center / Stabilize.
+    // 4.40 -> 4.60: Initial Scale (scale the front-facing headphone up).
+    // 4.60 -> 4.80: Text Reveal (headphones remain stable).
+    // 4.80 -> 5.30: Continuous Zoom.
+    if (p >= 4.00) {
+      const end = layout[layout.length - 1]; // p=4 standard framing
+      const zoomStart = end.zoom;
+      const targetZStart = BASE_DISTANCE / zoomStart;
+      const visibleHeightStart = 2 * Math.tan(vFov / 2) * targetZStart;
+      const visibleWidthStart = visibleHeightStart * currentAspect;
+      
+      const targetYStart = MODEL_WORLD_Y + (end.y - 0.5) * visibleHeightStart;
+      const targetXStart = MODEL_WORLD_X - (end.x - 0.5) * visibleWidthStart;
+      
+      const standardPos = new THREE.Vector3(targetXStart, targetYStart, targetZStart);
+      const centeredPos = new THREE.Vector3(MODEL_WORLD_X, MODEL_WORLD_Y, targetZStart); // Centered, no zoom yet
+      
+      // Phase 2: Center/Stabilize (4.30 -> 4.40)
+      const centerP = Math.min(Math.max((p - 4.30) / 0.10, 0), 1.0);
+      const smoothCenter = easeInOutCubic(centerP);
+      
+      targetX = THREE.MathUtils.lerp(standardPos.x, centeredPos.x, smoothCenter);
+      targetY = THREE.MathUtils.lerp(standardPos.y, centeredPos.y, smoothCenter);
+      
+      // Scaling is now handled entirely by the headphone model scaling, not the camera.
+      // Camera Z remains locked at the baseline distance.
+      targetZ = targetZStart;
+      targetLookX = targetX;
+      targetLookY = targetY;
+      
+      const dampSpeedCinematic = 25;
+      const smoothCinematic = 1 - Math.exp(-dampSpeedCinematic * delta);
+  
+      cameraRef.current.position.x = THREE.MathUtils.lerp(cameraRef.current.position.x, targetX, smoothCinematic);
+      cameraRef.current.position.y = THREE.MathUtils.lerp(cameraRef.current.position.y, targetY, smoothCinematic);
+      cameraRef.current.position.z = THREE.MathUtils.lerp(cameraRef.current.position.z, targetZ, smoothCinematic);
+  
+      lookAtTarget.current.x = THREE.MathUtils.lerp(lookAtTarget.current.x, targetLookX, smoothCinematic);
+      lookAtTarget.current.y = THREE.MathUtils.lerp(lookAtTarget.current.y, targetLookY, smoothCinematic);
+      lookAtTarget.current.z = 0;
+      
+      cameraRef.current.lookAt(lookAtTarget.current);
+      return;
+    }
+    // --- END CINEMATIC OVERRIDE ---
+
+    // Y convention: 0 = top, 1 = bottom. 
+    // To move the object down (larger viewportY), we must move the camera UP (positive shift).
+    targetY = MODEL_WORLD_Y + (viewportY - 0.5) * visibleHeight;
+
+    // X convention: 0 = left, 1 = right. 
+    // To move the object right (larger viewportX), we must move the camera LEFT (negative shift).
+    targetX = MODEL_WORLD_X - (viewportX - 0.5) * visibleWidth;
+    targetLookX = targetX;
     targetLookY = targetY;
-
-    // Phase 2 (1.0 to 2.0)
-    if (p > 1.0) {
-      let p2 = Math.min(Math.max(p - 1.0, 0), 1.0);
-      let m2 = getMoveP(p2);
-      targetX = isMobile ? 0 : -2.2 * m2;
-      targetLookX = isMobile ? 0 : -2.2 * m2;
-      targetY = SEC1_CAM_Y_END + (SEC2_CAM_Y_END - SEC1_CAM_Y_END) * m2;
-      if (!isMobile) targetY += responsiveOffsetY;
-      targetLookY = targetY;
-    }
-
-    // Phase 3 (2.0 to 3.0)
-    if (p > 2.0) {
-      let p3 = Math.min(Math.max(p - 2.0, 0), 1.0);
-      let m3 = getMoveP(p3);
-      targetX = isMobile ? 0 : -2.2 + 3.4 * m3;
-      targetLookX = isMobile ? 0 : -2.2 + 3.4 * m3;
-      targetY = SEC2_CAM_Y_END + (SEC3_CAM_Y_END - SEC2_CAM_Y_END) * m3;
-      if (!isMobile) targetY += responsiveOffsetY;
-      targetLookY = targetY;
-      targetZ = 7.0 + 1.0 * m3;
-    }
-
-    // Phase 4 (3.0 to 4.0)
-    if (p > 3.0) {
-      let p4 = Math.min(Math.max(p - 3.0, 0), 1.0);
-      let m4 = getMoveP(p4);
-      targetX = isMobile ? 0 : 1.2 - 1.2 * m4;
-      targetLookX = isMobile ? 0 : 1.2 - 1.2 * m4;
-      targetY = SEC3_CAM_Y_END + (SEC4_CAM_Y_END - SEC3_CAM_Y_END) * m4;
-      if (!isMobile) targetY += responsiveOffsetY;
-      targetLookY = targetY;
-      targetZ = 8.0 + 0.5 * m4;
-    }
-
-    // Phase 5 (4.0 to 5.0)
-    if (p > 4.0) {
-      let p5 = Math.min(Math.max(p - 4.0, 0), 1.0);
-      let m5 = getMoveP(p5);
-      targetX = isMobile ? 0 : -2.0 * m5;
-      targetLookX = isMobile ? 0 : -2.0 * m5;
-      targetY = SEC4_CAM_Y_END + (SEC5_CAM_Y_END - SEC4_CAM_Y_END) * m5;
-      if (!isMobile) targetY += responsiveOffsetY;
-      targetLookY = targetY;
-      targetZ = 8.5 - 1.5 * m5;
-    }
-
-    if (isMobile) {
-      targetX = 0;
-      targetLookX = 0;
-      targetZ += 3.5; // Pull camera back significantly on mobile to prevent clipping
-      
-      // Specifically adjust vertical positioning for mobile where layouts stack
-      if (p > 3.0 && p <= 4.0) {
-         let p4 = Math.min(Math.max(p - 3.0, 0), 1.0);
-         let m4 = getMoveP(p4);
-         targetY += 1.0 * m4; 
-         targetLookY += 1.0 * m4;
-      }
-      if (p > 4.0) {
-         let p5 = Math.min(Math.max(p - 4.0, 0), 1.0);
-         let m5 = getMoveP(p5);
-         targetY -= 1.0 * m5;
-         targetLookY -= 1.0 * m5;
-      }
-    }
 
     const dampSpeed = 25;
     const smooth = 1 - Math.exp(-dampSpeed * delta);
@@ -178,14 +181,16 @@ function CameraController() {
 }
 
 export default function ProductScene({ activeVariant }: ProductSceneProps) {
+  const actualVisualCenter = useRef(new THREE.Vector3(0, -1.5, 0));
+
   return (
     <div className="w-full h-full absolute inset-0 z-20 pointer-events-none">
       <Canvas 
         shadows={{ type: THREE.PCFShadowMap }} 
         dpr={[1, 2]}
-        style={{ pointerEvents: 'none', touchAction: 'pan-y' }}
+        className="pointer-events-none"
       >
-        <CameraController />
+        <CameraController actualVisualCenter={actualVisualCenter} />
 
         {/* Soft studio-lighting setup for premium illustration feel */}
         <ambientLight intensity={0.6} color="#F5F1E8" />
@@ -209,7 +214,15 @@ export default function ProductScene({ activeVariant }: ProductSceneProps) {
         <Suspense fallback={null}>
           {/* Normalization is now handled mathematically inside HeadphoneModel */}
           {/* Model moved downward slightly to sit below SONA ONE typography */}
-          <HeadphoneModel position={[0, -1.5, 0]} activeVariant={activeVariant} />
+          <HeadphoneModel 
+            position={[0, -1.3, 0]} 
+            activeVariant={activeVariant}
+            onBoundsCalculated={(center) => {
+              if (actualVisualCenter.current) {
+                actualVisualCenter.current.copy(center);
+              }
+            }}
+          />
 
           <ContactShadows
             position={[0, -3.5, 0]}
