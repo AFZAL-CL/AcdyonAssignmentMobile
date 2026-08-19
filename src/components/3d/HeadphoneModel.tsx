@@ -104,71 +104,69 @@ export default function HeadphoneModel({ activeVariant, ...props }: HeadphoneMod
       timeRef.current += delta;
       const p = getScrollProgress();
       
-      let baseRotY = 0;
+      const SECTION_CONFIG = [
+        0,                                                  // Start
+        Math.PI,                                            // Sec 1
+        Math.PI + Math.PI / 3,                              // Sec 2
+        Math.PI + Math.PI / 3,                              // Sec 3
+        Math.PI + Math.PI / 3 + Math.PI / 1.5,              // Sec 4
+        Math.PI + Math.PI / 3 + Math.PI / 1.5 + Math.PI / 6 // Sec 5
+      ];
+
+      const easeInOutCubic = (x: number): number => {
+        return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+      };
+
+      const sectionIdx = Math.min(Math.floor(p), 4);
+      const localP = Math.min(Math.max(p - sectionIdx, 0), 1);
+
+      const prevRot = SECTION_CONFIG[sectionIdx];
+      const nextRot = SECTION_CONFIG[sectionIdx + 1];
+
+      // Cinematic phases
+      // 0.0 to 0.70: Movement
+      // 0.70 to 0.82: Settle
+      // 0.82 to 1.00: 360 Spin
+
+      const movementProgress = Math.min(localP / 0.7, 1.0);
+      const spinProgress = Math.max(0, localP - 0.82) / 0.18;
+
+      const targetBaseRot = THREE.MathUtils.lerp(prevRot, nextRot, easeInOutCubic(movementProgress));
+      const spinRot = easeInOutCubic(spinProgress) * Math.PI * 2;
+      const completedSpins = sectionIdx * Math.PI * 2;
+
+      const absoluteTargetRotY = targetBaseRot + spinRot + completedSpins;
       let targetRotationX = 0;
 
-      const getMoveP = (localP: number) => Math.min(localP / 0.4, 1.0);
-      const getSpinP = (localP: number) => Math.min(Math.max(localP - 0.85, 0) / 0.15, 1.0);
-
-      // Section 1 (0 to 1.0)
-      let p1 = Math.min(Math.max(p, 0), 1.0);
-      let m1 = getMoveP(p1);
-      let s1 = getSpinP(p1);
-      baseRotY += (Math.PI) * m1;
-      baseRotY += (Math.PI * 2) * s1;
-
-      // Section 2 (1.0 to 2.0)
-      if (p > 1.0) {
-        let p2 = Math.min(Math.max(p - 1.0, 0), 1.0);
-        let m2 = getMoveP(p2);
-        let s2 = getSpinP(p2);
-        baseRotY += (Math.PI / 3) * m2;
-        baseRotY += (Math.PI * 2) * s2;
-      }
-      
-      // Section 3 (2.0 to 3.0)
-      if (p > 2.0) {
-        let p3 = Math.min(Math.max(p - 2.0, 0), 1.0);
-        // Section 3 has no base rotation change
-        let s3 = getSpinP(p3);
-        baseRotY += (Math.PI * 2) * s3;
-      }
-
-      // Section 4 (3.0 to 4.0)
-      if (p > 3.0) {
-        let p4 = Math.min(Math.max(p - 3.0, 0), 1.0);
-        let m4 = getMoveP(p4);
-        let s4 = getSpinP(p4);
-        baseRotY += (Math.PI / 1.5) * m4;
-        baseRotY += (Math.PI * 2) * s4;
-      }
-
-      // Section 5 (4.0 to 5.0)
-      if (p > 4.0) {
-        let p5 = Math.min(Math.max(p - 4.0, 0), 1.0);
-        let m5 = getMoveP(p5);
-        let s5 = getSpinP(p5);
-        baseRotY += (Math.PI / 6) * m5;
-        baseRotY += (Math.PI * 2) * s5;
-      }
-      
-      const idleRot = timeRef.current * 0.05;
+      // Double smoothing fix (replace fixed 0.05 lerp with exp decay)
+      const dampSpeed = 25;
       
       group.current.rotation.y = THREE.MathUtils.lerp(
         group.current.rotation.y, 
-        baseRotY + idleRot, 
-        0.05
+        absoluteTargetRotY, 
+        1 - Math.exp(-dampSpeed * delta)
       );
-      group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, targetRotationX, 0.05);
       
+      group.current.rotation.x = THREE.MathUtils.lerp(
+        group.current.rotation.x, 
+        targetRotationX, 
+        1 - Math.exp(-dampSpeed * delta)
+      );
+      
+      // Floating idle animation kept but decoupled from orientation
       innerGroup.current.position.y = Math.sin(timeRef.current * 1.5) * 0.05;
       
+      const colorDampSpeed = 15;
       const isRed = primaryColor.toUpperCase() === '#FF4D4D';
-      shaderUniforms.current.uMix.value = THREE.MathUtils.lerp(shaderUniforms.current.uMix.value, isRed ? 0.0 : 1.0, 0.1);
+      shaderUniforms.current.uMix.value = THREE.MathUtils.lerp(
+        shaderUniforms.current.uMix.value, 
+        isRed ? 0.0 : 1.0, 
+        1 - Math.exp(-colorDampSpeed * delta)
+      );
       
-      shaderUniforms.current.uPrimary.value.lerp(targetPrimary, 0.1);
-      shaderUniforms.current.uSecondary.value.lerp(targetSecondary, 0.1);
-      shaderUniforms.current.uDetail.value.lerp(targetDetail, 0.1);
+      shaderUniforms.current.uPrimary.value.lerp(targetPrimary, 1 - Math.exp(-colorDampSpeed * delta));
+      shaderUniforms.current.uSecondary.value.lerp(targetSecondary, 1 - Math.exp(-colorDampSpeed * delta));
+      shaderUniforms.current.uDetail.value.lerp(targetDetail, 1 - Math.exp(-colorDampSpeed * delta));
     }
   });
 

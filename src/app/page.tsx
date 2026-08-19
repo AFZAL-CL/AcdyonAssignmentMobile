@@ -114,13 +114,19 @@ export default function Home() {
 
     gsap.to(".scroll-arrow", { y: 8, repeat: -1, yoyo: true, ease: "power1.inOut", duration: 1.5, delay: 3.5 });
 
+    const isMobile = window.innerWidth < 768;
+    const DESKTOP_SCROLL_DIST = window.innerHeight * 12;
+    const MOBILE_SCROLL_DIST = window.innerHeight * 8;
+    const DESKTOP_SCRUB = 1;
+    const MOBILE_SCRUB = 0.5;
+
     // --- 2. SCROLL DRIVEN ANIMATION (Scrubbed) ---
     const scrollTl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: "+=15000",
-        scrub: 1,
+        end: `+=${isMobile ? MOBILE_SCROLL_DIST : DESKTOP_SCROLL_DIST}`,
+        scrub: isMobile ? MOBILE_SCRUB : DESKTOP_SCRUB,
         pin: true,
         onUpdate: (self) => {
           setScrollProgress(self.progress * 5.0);
@@ -129,72 +135,72 @@ export default function Home() {
     });
 
     // --- PHASE 1 to 4: HERO (Time 0.0 to 1.0) ---
-    scrollTl.to(heroContentRef.current, { y: -150, scale: 0.9, opacity: 0, ease: "power2.inOut", duration: 0.03 }, 0); 
+    scrollTl.to(heroContentRef.current, { y: -150, scale: 0.9, opacity: 0, ease: "power2.inOut", duration: 0.1 }, 0); 
     scrollTl.to(accent1Ref.current, { scale: 1.15, rotation: 15, ease: "power1.inOut", duration: 0.4 }, 0.0);
     scrollTl.fromTo([revealLine1Ref.current, revealLine2Ref.current, revealLine3Ref.current], 
       { y: 40, opacity: 0 }, { y: 0, opacity: 1, ease: "power2.out", duration: 0.15, stagger: 0.05 }, 0.4
     );
     scrollTl.fromTo(comicLinesRef.current, { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, ease: "power2.out", duration: 0.1 }, 0.6);
-    // Fade out spokes exactly as section 2 starts
-    scrollTl.fromTo(accent1Ref.current, { opacity: 0.25 }, { opacity: 0, duration: 0.03 }, 1.0);
+    // Fade out spokes smoothly
+    scrollTl.fromTo(accent1Ref.current, { opacity: 0.25 }, { opacity: 0, duration: 0.1 }, 1.0);
     scrollTl.to({}, { duration: 0.1 }, 0.9);
 
     // --- PHASE 5: PRODUCT DESIGN REVEAL (Time 1.0 to 2.0) ---
     // Start at 1.0
-    scrollTl.to(revealContentRef.current, { y: -50, opacity: 0, duration: 0.03 }, 1.0);
+    scrollTl.to(revealContentRef.current, { y: -50, opacity: 0, duration: 0.1 }, 1.0);
     scrollTl.fromTo(section2Ref.current, { opacity: 0 }, { opacity: 1, duration: 0.1 }, 1.1);
-    scrollTl.fromTo(designTextLine1Ref.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 1.4);
-    scrollTl.fromTo(designTextLine2Ref.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 1.45);
-    scrollTl.fromTo(designTextLine3Ref.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 1.5);
-    scrollTl.fromTo(designSubtextRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 1.55);
+    scrollTl.fromTo(designTextLine1Ref.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 1.2);
+    scrollTl.fromTo(designTextLine2Ref.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 1.25);
+    scrollTl.fromTo(designTextLine3Ref.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 1.3);
+    scrollTl.fromTo(designSubtextRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 1.35);
     scrollTl.fromTo([spec1Ref.current, spec2Ref.current, spec3Ref.current],
-      { opacity: 0, scale: 0.9, x: 20 }, { opacity: 1, scale: 1, x: 0, ease: "back.out(1.2)", duration: 0.15, stagger: 0.05 }, 1.6
+      { opacity: 0, scale: 0.9, x: 20 }, { opacity: 1, scale: 1, x: 0, ease: "back.out(1.2)", duration: 0.15, stagger: 0.05 }, 1.4
     );
     scrollTl.to({}, { duration: 0.2 }, 1.8);
 
     // --- PHASE 6: ENGINEERED FOR SOUND (Time 2.0 to 3.0) ---
     // Start at 2.0
-    scrollTl.to(section2Ref.current, { opacity: 0, duration: 0.03 }, 2.0);
+    scrollTl.to(section2Ref.current, { opacity: 0, duration: 0.1 }, 2.0);
     scrollTl.fromTo(section3Ref.current, { opacity: 0 }, { opacity: 1, duration: 0.1 }, 2.1);
-    scrollTl.fromTo(blueprintRef.current, { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.1 }, 2.3);
-    scrollTl.fromTo(engTextLine1Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 2.4);
-    scrollTl.fromTo(engTextLine2Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 2.45);
-    scrollTl.fromTo(engTextLine3Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 2.5);
-    scrollTl.fromTo(engSubtextRef.current, { opacity: 0 }, { opacity: 1, duration: 0.1 }, 2.55);
+    scrollTl.fromTo(blueprintRef.current, { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.1 }, 2.15);
+    scrollTl.fromTo(engTextLine1Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 2.2);
+    scrollTl.fromTo(engTextLine2Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 2.25);
+    scrollTl.fromTo(engTextLine3Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 2.3);
+    scrollTl.fromTo(engSubtextRef.current, { opacity: 0 }, { opacity: 1, duration: 0.1 }, 2.35);
     
     // Animate feature callouts on right side
-    scrollTl.fromTo(anno1Ref.current, { x: 20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.1 }, 2.6);
-    scrollTl.fromTo(anno2Ref.current, { x: 20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.1 }, 2.62);
-    scrollTl.fromTo(anno3Ref.current, { x: 20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.1 }, 2.64);
-    scrollTl.fromTo(anno4Ref.current, { x: 20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.1 }, 2.66);
+    scrollTl.fromTo(anno1Ref.current, { x: 20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.1 }, 2.4);
+    scrollTl.fromTo(anno2Ref.current, { x: 20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.1 }, 2.42);
+    scrollTl.fromTo(anno3Ref.current, { x: 20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.1 }, 2.44);
+    scrollTl.fromTo(anno4Ref.current, { x: 20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.1 }, 2.46);
     
     // Draw lines
-    scrollTl.to('.anno-line', { strokeDashoffset: 0, duration: 0.1, stagger: 0.02 }, 2.6);
-    scrollTl.to('.anno-dot', { opacity: 1, duration: 0.1, stagger: 0.02 }, 2.65);
+    scrollTl.to('.anno-line', { strokeDashoffset: 0, duration: 0.1, stagger: 0.02 }, 2.4);
+    scrollTl.to('.anno-dot', { opacity: 1, duration: 0.1, stagger: 0.02 }, 2.45);
 
     // --- PHASE 7: PRODUCT FEATURES SHOWCASE (Time 3.0 to 4.0) ---
     // Start at 3.0
-    scrollTl.to(section3Ref.current, { opacity: 0, duration: 0.03 }, 3.0);
+    scrollTl.to(section3Ref.current, { opacity: 0, duration: 0.1 }, 3.0);
     scrollTl.fromTo(section4Ref.current, { opacity: 0 }, { opacity: 1, duration: 0.1 }, 3.1);
-    scrollTl.fromTo(soundWavesRef.current, { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.1 }, 3.3);
-    scrollTl.fromTo(soundTextLine1Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 3.4);
-    scrollTl.fromTo(soundTextLine2Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 3.45);
-    scrollTl.fromTo(soundTextLine3Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 3.5);
-    scrollTl.fromTo(feature1Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 3.55);
+    scrollTl.fromTo(soundWavesRef.current, { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.1 }, 3.15);
+    scrollTl.fromTo(soundTextLine1Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 3.2);
+    scrollTl.fromTo(soundTextLine2Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 3.25);
+    scrollTl.fromTo(soundTextLine3Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 3.3);
+    scrollTl.fromTo(feature1Ref.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1 }, 3.35);
     
     // Animate the 4 horizontal features
     scrollTl.fromTo([feature2Ref.current, feature3Ref.current, feature4Ref.current, feature5Ref.current], 
-      { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1, stagger: 0.05 }, 3.6);
+      { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.1, stagger: 0.05 }, 3.4);
     
     scrollTl.to({}, { duration: 0.2 }, 3.9);
 
     // --- PHASE 8: PRODUCT CONFIGURATOR (Time 4.0 to 5.0) ---
     // Start at 4.0
-    scrollTl.to(section4Ref.current, { opacity: 0, duration: 0.03 }, 4.0);
-    scrollTl.fromTo(section5Ref.current, { opacity: 0, pointerEvents: 'none' }, { opacity: 1, pointerEvents: 'auto', duration: 0.1 }, 4.1);
+    scrollTl.to(section4Ref.current, { opacity: 0, duration: 0.1 }, 4.0);
+    scrollTl.fromTo(section5Ref.current, { opacity: 0, pointerEvents: 'none' }, { opacity: 1, pointerEvents: 'auto', duration: 0.2 }, 4.2);
     scrollTl.fromTo(configContentRef.current,
       { x: -50, opacity: 0 },
-      { x: 0, opacity: 1, ease: "power2.out", duration: 0.2 },
+      { x: 0, opacity: 1, ease: "power2.out", duration: 0.4 },
       4.4
     );
 
