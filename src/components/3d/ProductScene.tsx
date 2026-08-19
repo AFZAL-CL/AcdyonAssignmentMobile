@@ -56,11 +56,11 @@ function CameraController({ actualVisualCenter }: { actualVisualCenter: React.Re
         { x: 0.75, y: 0.29, zoom: 1.00 }  // p=4 (Section 4 - formerly Section 5, moved up)
       ],
       mobile: [
-        { x: 0.50, y: 0.37, zoom: 0.58 }, // p=0
-        { x: 0.50, y: 0.24, zoom: 0.67 }, // p=1
-        { x: 0.50, y: 0.20, zoom: 0.55 }, // p=2 (Adjusted to leave space for top spec)
+        { x: 0.50, y: 0.40, zoom: 0.58 }, // p=0
+        { x: 0.50, y: 0.34, zoom: 0.67 }, // p=1
+        { x: 0.50, y: 0.32, zoom: 0.55 }, // p=2 (Adjusted to leave space for top spec)
         { x: 0.50, y: 0.43, zoom: 0.50 }, // p=3 (Moved up slightly for Sound Field)
-        { x: 0.50, y: 0.19, zoom: 0.67 }  // p=4
+        { x: 0.50, y: 0.26, zoom: 0.67 }  // p=4
       ],
       smallMobile: [
         { x: 0.50, y: 0.40, zoom: 0.54 }, // p=0
