@@ -330,14 +330,15 @@ export default function Home() {
       
       {/* Hero Interactive Elements (Z-40 to be above 3D scene) */}
       <div ref={heroInteractiveRef} className="absolute inset-0 pointer-events-none z-40">
-        <div ref={heroCtaRef} className="absolute bottom-[18vh] left-1/2 -translate-x-1/2 flex flex-col items-center gap-5 md:gap-6 pointer-events-auto w-max opacity-0">
-          <p ref={introSubtitleRef} className="text-sm md:text-lg font-bold tracking-[0.2em] text-muted text-center">
+        <div className="absolute bottom-[18vh] left-1/2 -translate-x-1/2 flex flex-col items-center gap-5 md:gap-6 pointer-events-auto w-max">
+          <p ref={introSubtitleRef} className="text-sm md:text-lg font-bold tracking-[0.2em] text-muted text-center opacity-0">
             SOUND. UNBOUND.
           </p>
           
           <button 
+            ref={heroCtaRef}
             onClick={() => scrollToSection('technology')}
-            className="group relative flex items-center gap-2 text-[11px] md:text-xs font-bold tracking-[0.2em] text-foreground uppercase cursor-pointer"
+            className="group relative flex items-center gap-2 text-[11px] md:text-xs font-bold tracking-[0.2em] text-foreground uppercase cursor-pointer opacity-0"
           >
             EXPLORE SONA 
             <span className="group-hover:translate-x-[4px] transition-transform duration-300">→</span>
