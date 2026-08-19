@@ -1,11 +1,11 @@
 'use client';
 
-import { useRef, useState } from "react";
+import { useRef, useState, Fragment } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import ProductScene from "@/components/3d/ProductScene";
-import { setScrollProgress } from "@/lib/scrollStore";
+import { setScrollProgress, getScrollProgress, registerScrollToSection, scrollToSection } from "@/lib/scrollStore";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -43,8 +43,10 @@ export default function Home() {
   
   // Phase 1-4 Refs (Hero)
   const heroContentRef = useRef<HTMLDivElement>(null);
+  const heroInteractiveRef = useRef<HTMLDivElement>(null);
   const introTitleRef = useRef<HTMLHeadingElement>(null);
   const introSubtitleRef = useRef<HTMLParagraphElement>(null);
+  const heroCtaRef = useRef<HTMLButtonElement>(null);
   const indicatorRef = useRef<HTMLDivElement>(null);
   const accent1Ref = useRef<HTMLDivElement>(null);
   const accent2Ref = useRef<HTMLDivElement>(null);
@@ -107,8 +109,10 @@ export default function Home() {
     introTl.to("#global-nav", { opacity: 1, duration: 1, ease: "power2.inOut" }, 0.5)
            .fromTo(introTitleRef.current, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2, ease: "power3.out" }, 0.8)
            .fromTo([accent1Ref.current, accent2Ref.current], { opacity: 0, scale: 0.8 }, { opacity: 0.25, scale: 1, duration: 2, ease: "power2.out", stagger: 0.2 }, 1.0)
-           .to(".spoke-line", { strokeDashoffset: 0, duration: 1.5, stagger: 0.03, ease: "power2.out" }, 1.0)
+           .to(".tech-line, .tech-ring", { strokeDashoffset: 0, duration: 1.5, stagger: 0.05, ease: "power2.out" }, 1.0)
+           .to(".tech-dot", { opacity: 1, duration: 0.5, stagger: 0.05, ease: "power2.out" }, 1.5)
            .fromTo(introSubtitleRef.current, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 1, ease: "power2.out" }, 2.5)
+           .fromTo(heroCtaRef.current, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 1, ease: "power2.out" }, 2.7)
            .fromTo(indicatorRef.current, { opacity: 0 }, { opacity: 1, duration: 1 }, 3.0);
 
     gsap.to(".scroll-arrow", { y: 8, repeat: -1, yoyo: true, ease: "power1.inOut", duration: 1.5, delay: 3.5 });
@@ -119,7 +123,6 @@ export default function Home() {
     const DESKTOP_SCRUB = 0.5;
     const MOBILE_SCRUB = 0.5;
 
-    // --- 2. SCROLL DRIVEN ANIMATION (Scrubbed) ---
     const scrollTl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
@@ -133,14 +136,39 @@ export default function Home() {
       }
     });
 
+    // Register navigation callback
+    registerScrollToSection((section) => {
+      let targetTime = 0;
+      switch (section) {
+        case 'top': targetTime = 0; break;
+        case 'technology': targetTime = 1.0; break; // Start of Phase 5
+        case 'sound': targetTime = 2.0; break; // Start of Phase 7
+        case 'product': targetTime = 3.0; break; // Start of Phase 8
+        case 'about': targetTime = 4.0; break; // Start of Phase 9
+        case 'next': {
+           const t = getScrollProgress();
+           if (t < 0.9) targetTime = 1.0;
+           else if (t < 1.9) targetTime = 2.0;
+           else if (t < 2.9) targetTime = 3.0;
+           else targetTime = 4.0;
+           break;
+        }
+      }
+      
+      const scrollDist = isMobile ? MOBILE_SCROLL_DIST : DESKTOP_SCROLL_DIST;
+      const targetY = (targetTime / 5.4) * scrollDist;
+      
+      window.scrollTo({ top: targetY, behavior: 'smooth' });
+    });
+
     // --- PHASE 1 to 4: HERO (Time 0.0 to 1.0) ---
-    scrollTl.to(heroContentRef.current, { y: -150, scale: 0.9, opacity: 0, ease: "power2.inOut", duration: 0.1 }, 0); 
+    scrollTl.to([heroContentRef.current, heroInteractiveRef.current], { y: -150, scale: 0.9, opacity: 0, ease: "power2.inOut", duration: 0.1 }, 0); 
     scrollTl.to(accent1Ref.current, { scale: 1.15, rotation: 15, ease: "power1.inOut", duration: 0.4 }, 0.0);
     scrollTl.fromTo([revealLine1Ref.current, revealLine2Ref.current, revealLine3Ref.current], 
       { y: 40, opacity: 0 }, { y: 0, opacity: 1, ease: "power2.out", duration: 0.15, stagger: 0.05 }, 0.4
     );
     scrollTl.fromTo(comicLinesRef.current, { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, ease: "power2.out", duration: 0.1 }, 0.6);
-    // Fade out spokes smoothly
+    // Fade out technical grid smoothly
     scrollTl.fromTo(accent1Ref.current, { opacity: 0.25 }, { opacity: 0, duration: 0.1 }, 1.0);
     scrollTl.to({}, { duration: 0.1 }, 0.9);
 
@@ -249,25 +277,40 @@ export default function Home() {
 
   return (
     <>
-    <main ref={containerRef} className="relative w-screen h-screen overflow-hidden bg-[var(--background)]">
+    <main ref={containerRef} className="relative w-full h-screen overflow-hidden bg-[var(--background)]">
       
       {/* COMIC-EDITORIAL DETAILS */}
       <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none overflow-hidden">
-        {/* Radial line burst */}
-        <div ref={accent1Ref} className="absolute w-[70vw] h-[70vw] max-w-[900px] max-h-[900px] opacity-0">
-          <svg viewBox="0 0 100 100" className="w-full h-full stroke-muted/20 stroke-[0.4]" fill="none">
-              {[...Array(24)].map((_, i) => (
-                <line 
-                  key={i} 
-                  className="spoke-line"
-                  pathLength="1"
-                  strokeDasharray="1"
-                  strokeDashoffset="1"
-                  x1="50" y1="50" 
-                  x2={(50 + 40 * Math.cos(i * (Math.PI / 12))).toFixed(3)} 
-                  y2={(50 + 40 * Math.sin(i * (Math.PI / 12))).toFixed(3)} 
-                />
-             ))}
+        {/* Technical Polar Grid */}
+        <div ref={accent1Ref} className="absolute w-[80vw] h-[80vw] max-w-[1000px] max-h-[1000px] opacity-0">
+          <svg viewBox="0 0 100 100" className="w-full h-full stroke-foreground/15 stroke-[0.2]" fill="none">
+            {/* Concentric rings */}
+            {[20, 30, 40, 48].map((r, i) => (
+              <circle 
+                key={`ring-${i}`}
+                cx="50" cy="50" r={r} 
+                className="tech-ring"
+                strokeDasharray="1"
+                strokeDashoffset="1"
+                pathLength="1"
+              />
+            ))}
+            
+            {/* Main Crosshairs */}
+            <line x1="5" y1="50" x2="95" y2="50" className="tech-line" strokeDasharray="1" strokeDashoffset="1" pathLength="1" />
+            <line x1="50" y1="5" x2="50" y2="95" className="tech-line" strokeDasharray="1" strokeDashoffset="1" pathLength="1" />
+            
+            {/* Diagonal Crosshairs */}
+            <line x1="18.18" y1="18.18" x2="81.82" y2="81.82" className="tech-line stroke-foreground/10 stroke-[0.1]" strokeDasharray="1" strokeDashoffset="1" pathLength="1" />
+            <line x1="18.18" y1="81.82" x2="81.82" y2="18.18" className="tech-line stroke-foreground/10 stroke-[0.1]" strokeDasharray="1" strokeDashoffset="1" pathLength="1" />
+            
+            {/* Technical Nodes (Dots) */}
+            {[5, 20, 30, 40, 48, 60, 70, 80, 95].map((pos) => (
+              <Fragment key={`nodes-${pos}`}>
+                <circle cx="50" cy={pos} r="0.4" fill="currentColor" className="text-foreground/30 tech-dot opacity-0" />
+                <circle cx={pos} cy="50" r="0.4" fill="currentColor" className="text-foreground/30 tech-dot opacity-0" />
+              </Fragment>
+            ))}
           </svg>
         </div>
         {/* Small coral circular accent */}
@@ -283,22 +326,34 @@ export default function Home() {
         >
           SONA ONE
         </h1>
-        
-        <div className="absolute bottom-[18vh] flex flex-col items-center">
-          <p ref={introSubtitleRef} className="text-sm md:text-lg font-bold tracking-[0.2em] text-muted opacity-0">
+      </div>
+      
+      {/* Hero Interactive Elements (Z-40 to be above 3D scene) */}
+      <div ref={heroInteractiveRef} className="absolute inset-0 pointer-events-none z-40">
+        <div ref={heroCtaRef} className="absolute bottom-[18vh] left-1/2 -translate-x-1/2 flex flex-col items-center gap-5 md:gap-6 pointer-events-auto w-max opacity-0">
+          <p ref={introSubtitleRef} className="text-sm md:text-lg font-bold tracking-[0.2em] text-muted text-center">
             SOUND. UNBOUND.
           </p>
+          
+          <button 
+            onClick={() => scrollToSection('technology')}
+            className="group relative flex items-center gap-2 text-[11px] md:text-xs font-bold tracking-[0.2em] text-foreground uppercase cursor-pointer"
+          >
+            EXPLORE SONA 
+            <span className="group-hover:translate-x-[4px] transition-transform duration-300">→</span>
+            <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-full h-[1.5px] bg-coral transition-all duration-300" />
+          </button>
         </div>
         
-        <div ref={indicatorRef} className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-0">
-          <span className="text-[10px] font-bold tracking-widest text-foreground uppercase">
-            Scroll to explore
-          </span>
-          <div className="scroll-arrow text-foreground text-xs">
+        <div ref={indicatorRef} className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 pointer-events-auto">
+          <button 
+            onClick={() => scrollToSection('technology')}
+            className="scroll-arrow text-foreground/40 hover:text-foreground transition-colors p-4 -m-4 cursor-pointer"
+            aria-label="Scroll down"
+          >
             ↓
-          </div>
+          </button>
         </div>
-
       </div>
 
       {/* --- SECTION 6: PREMIUM CLOSING --- */}

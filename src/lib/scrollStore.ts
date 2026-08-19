@@ -15,3 +15,14 @@ export const subscribeScroll = (listener: Listener) => {
     listeners.delete(listener);
   };
 };
+
+export type Section = 'top' | 'technology' | 'sound' | 'product' | 'about' | 'next';
+let scrollToSectionCallback: ((section: Section) => void) | null = null;
+
+export const registerScrollToSection = (callback: (section: Section) => void) => {
+  scrollToSectionCallback = callback;
+};
+
+export const scrollToSection = (section: Section) => {
+  if (scrollToSectionCallback) scrollToSectionCallback(section);
+};
