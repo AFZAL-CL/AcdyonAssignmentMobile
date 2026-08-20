@@ -9,6 +9,9 @@ A highly interactive, 3D-driven web experience built to showcase the fictional S
 - **Scroll-Driven 3D Exploration:** Built with React Three Fiber and GSAP, the 3D headphone model acts as the continuous central element. As the user scrolls, the camera, lighting, and model rotation smoothly transition between narrative phases.
 - **Cinematic Storytelling:** Instead of disjointed sections, the experience flows continuously from a technical blueprint intro, through product reveals, into an immersive sound field, and concludes with an interactive configurator.
 - **Premium Minimalist Design:** Employs a restrained color palette, high-fidelity typography, technical polar grids, and extremely subtle hover interactions to evoke the feeling of high-end hardware engineering.
+
+![Technology Phase](./public/docs/specs.png)
+
 - **Intelligent Navigation:** A custom smooth-scroll navigation system that bridges DOM clicks with the GSAP ScrollTrigger timeline, ensuring that jumping between sections never breaks the 3D animation states.
 - **Responsive Architecture:** Distinct mobile and desktop layouts ensure the 3D canvas and typography remain perfectly balanced across all viewports.
 
